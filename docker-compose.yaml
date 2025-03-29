@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  backend:
+    image: battletalk-backend
+    env_file:
+      - backend/.env
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./backend:/backend
+
+  frontend:
+    image: battletalk-frontend
+    env_file:
+      - frontend/.env
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/frontend
+    depends_on:
+      - backend
