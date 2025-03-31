@@ -9,7 +9,7 @@ import ollama
 import re
 
 # Load Whisper model
-model = whisper.load_model("medium.en")
+model = whisper.load_model("tiny.en")
 
 # Menyimpan daftar klien yang terhubung dengan user ID
 connected_clients = {}  # {websocket: "user1" / "user2"}
@@ -82,9 +82,9 @@ async def process_audio(data):
 async def chat_with_ollama(prompt, requesting_user=None):
     """Mengirim permintaan ke Ollama dan memastikan respons valid untuk feedback, scoring, dan recommendations."""
     try:
-        await ensure_model_exists("deepseek-r1:8b")  # Pastikan model tersedia
+        await ensure_model_exists("qwen2.5:0.5b")  # Pastikan model tersedia
 
-        response = ollama.chat(model='deepseek-r1:8b', messages=[{"role": "system", "content": prompt}])
+        response = ollama.chat(model='qwen2.5:0.5b', messages=[{"role": "system", "content": prompt}])
         response_text = response['message']['content']
 
         print(f"[INFO] Hasil dari Ollama: {response_text}")
