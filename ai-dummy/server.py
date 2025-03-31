@@ -17,6 +17,22 @@ connected_clients = {}  # {websocket: "user1" / "user2"}
 # Menyimpan transkripsi untuk setiap user
 conversation_history = {"user1": [], "user2": []}
 
+async def ensure_model_exists(model_name):
+    """Cek apakah model tersedia, jika tidak, lakukan pull."""
+    try:
+        available_models = ollama.list()["models"]
+        model_names = [m["name"] for m in available_models]
+
+        if model_name not in model_names:
+            print(f"[INFO] Model '{model_name}' tidak ditemukan, sedang melakukan pull...")
+            pull_response = ollama.pull(model_name)
+            print(f"[INFO] Pull selesai: {pull_response}")
+        else:
+            print(f"[INFO] Model '{model_name}' sudah tersedia.")
+
+    except Exception as e:
+        print(f"[ERROR] Gagal mengecek atau pull model: {e}")
+
 async def process_audio(data):
     """Mengonversi audio Base64 ke teks menggunakan Whisper"""
     try:
@@ -66,6 +82,8 @@ async def process_audio(data):
 async def chat_with_ollama(prompt, requesting_user=None):
     """Mengirim permintaan ke Ollama dan memastikan respons valid untuk feedback, scoring, dan recommendations."""
     try:
+        await ensure_model_exists("deepseek-r1:8b")  # Pastikan model tersedia
+
         response = ollama.chat(model='deepseek-r1:8b', messages=[{"role": "system", "content": prompt}])
         response_text = response['message']['content']
 

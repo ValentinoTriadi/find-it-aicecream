@@ -1,0 +1,12 @@
+asyncio
+websockets
+whisper
+tempfile
+json
+base64
+ollama
+re
+ffmpeg-python
+numpy
+soundfile
+torchaudio
