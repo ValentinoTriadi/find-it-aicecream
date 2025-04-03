@@ -11,7 +11,7 @@ COPY . /app
 RUN apt update && apt install -y ffmpeg
 
 # Install semua dependensi Python
-RUN pip install --no-cache-dir -r reqlist.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose port WebSocket
 EXPOSE 8000

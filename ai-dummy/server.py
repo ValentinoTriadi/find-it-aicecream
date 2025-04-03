@@ -17,6 +17,7 @@ connected_clients = {}  # {websocket: "user1" / "user2"}
 # Menyimpan transkripsi untuk setiap user
 conversation_history = {"user1": [], "user2": []}
 
+
 async def ensure_model_exists(model_name):
     """Cek apakah model tersedia, jika tidak, lakukan pull."""
     try:
@@ -24,7 +25,9 @@ async def ensure_model_exists(model_name):
         model_names = [m["name"] for m in available_models]
 
         if model_name not in model_names:
-            print(f"[INFO] Model '{model_name}' tidak ditemukan, sedang melakukan pull...")
+            print(
+                f"[INFO] Model '{model_name}' tidak ditemukan, sedang melakukan pull..."
+            )
             pull_response = ollama.pull(model_name)
             print(f"[INFO] Pull selesai: {pull_response}")
         else:
@@ -32,6 +35,7 @@ async def ensure_model_exists(model_name):
 
     except Exception as e:
         print(f"[ERROR] Gagal mengecek atau pull model: {e}")
+
 
 async def process_audio(data):
     """Mengonversi audio Base64 ke teks menggunakan Whisper"""
@@ -51,8 +55,12 @@ async def process_audio(data):
 
         # Konversi WebM ke WAV menggunakan ffmpeg
         wav_path = temp_audio_path.replace(".webm", ".wav")
-        ffmpeg_cmd = f"ffmpeg -i {temp_audio_path} -ar 16000 -ac 1 -c:a pcm_s16le {wav_path}"
-        process = await asyncio.create_subprocess_shell(ffmpeg_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        ffmpeg_cmd = (
+            f"ffmpeg -i {temp_audio_path} -ar 16000 -ac 1 -c:a pcm_s16le {wav_path}"
+        )
+        process = await asyncio.create_subprocess_shell(
+            ffmpeg_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        )
         stdout, stderr = await process.communicate()
 
         # Jika ffmpeg gagal, kirim error
@@ -78,14 +86,17 @@ async def process_audio(data):
     except Exception as e:
         print(f"[ERROR] Gagal memproses audio: {e}")
         return {"error": "Gagal memproses audio."}
-    
+
+
 async def chat_with_ollama(prompt, requesting_user=None):
     """Mengirim permintaan ke Ollama dan memastikan respons valid untuk feedback, scoring, dan recommendations."""
     try:
         await ensure_model_exists("qwen2.5:0.5b")  # Pastikan model tersedia
 
-        response = ollama.chat(model='qwen2.5:0.5b', messages=[{"role": "system", "content": prompt}])
-        response_text = response['message']['content']
+        response = ollama.chat(
+            model="qwen2.5:0.5b", messages=[{"role": "system", "content": prompt}]
+        )
+        response_text = response["message"]["content"]
 
         print(f"[INFO] Hasil dari Ollama: {response_text}")
 
@@ -95,7 +106,7 @@ async def chat_with_ollama(prompt, requesting_user=None):
         if match:
             json_text = match.group(0)  # Ambil hanya bagian JSON
             parsed_data = json.loads(json_text)  # Parsing ke dictionary
-            
+
             print(f"[INFO] Hasil dari Ollama (regex parsing): {parsed_data}")
 
             # **📌 Cek jenis respons yang tersedia**
@@ -104,36 +115,42 @@ async def chat_with_ollama(prompt, requesting_user=None):
             if "feedback" in parsed_data:
                 result["feedback"] = {
                     "user1": parsed_data["feedback"].get("user1", ""),
-                    "user2": parsed_data["feedback"].get("user2", "")
+                    "user2": parsed_data["feedback"].get("user2", ""),
                 }
 
             if "scoring" in parsed_data:
                 result["scoring"] = {
-                    "user1": str(parsed_data["scoring"].get("user1", "")),  # Pastikan skor jadi string
-                    "user2": str(parsed_data["scoring"].get("user2", ""))
+                    "user1": str(
+                        parsed_data["scoring"].get("user1", "")
+                    ),  # Pastikan skor jadi string
+                    "user2": str(parsed_data["scoring"].get("user2", "")),
                 }
-
-
 
             if "recommendations" in parsed_data:
                 result["recommendations"] = {
-                    "user1": parsed_data["recommendations"].get("user1", "No recommendation available."),
-                    "user2": parsed_data["recommendations"].get("user2", "No recommendation available.")
+                    "user1": parsed_data["recommendations"].get(
+                        "user1", "No recommendation available."
+                    ),
+                    "user2": parsed_data["recommendations"].get(
+                        "user2", "No recommendation available."
+                    ),
                 }
 
             # **🔄 Jika permintaan spesifik (recommend_script), hanya ambil bagian terkait**
             if requesting_user and "recommendations" in result:
-                return result["recommendations"].get(requesting_user, "No recommendation found.")
+                return result["recommendations"].get(
+                    requesting_user, "No recommendation found."
+                )
 
             return result if result else {"error": "No valid data found."}
 
         else:
             print("[ERROR] Failed to extract JSON, trying alternative method...")
-            json_start = response_text.find('{')
-            json_end = response_text.rfind('}')
-            
+            json_start = response_text.find("{")
+            json_end = response_text.rfind("}")
+
             if json_start != -1 and json_end != -1:
-                json_text = response_text[json_start:json_end+1]
+                json_text = response_text[json_start : json_end + 1]
                 parsed_data = json.loads(json_text)
 
                 print(f"[INFO] Hasil dari Ollama (manual parsing): {parsed_data}")
@@ -153,8 +170,8 @@ async def chat_with_ollama(prompt, requesting_user=None):
 async def generate_feedback():
     """Menghasilkan feedback keseluruhan untuk semua user"""
     conversation_text = "\n".join(
-        [f"user1: {t}" for t in conversation_history["user1"]] +
-        [f"user2: {t}" for t in conversation_history["user2"]]
+        [f"user1: {t}" for t in conversation_history["user1"]]
+        + [f"user2: {t}" for t in conversation_history["user2"]]
     )
 
     prompt = f"""
@@ -222,11 +239,12 @@ json
     # **Ambil hanya bagian feedback**
     return result.get("feedback", {"error": "No feedback available."})
 
+
 async def generate_scoring():
     """Menghasilkan skor keseluruhan 1-3 untuk semua user berdasarkan performa"""
     conversation_text = "\n".join(
-        [f"user1: {t}" for t in conversation_history["user1"]] +
-        [f"user2: {t}" for t in conversation_history["user2"]]
+        [f"user1: {t}" for t in conversation_history["user1"]]
+        + [f"user2: {t}" for t in conversation_history["user2"]]
     )
 
     prompt = f"""
@@ -297,10 +315,10 @@ json
 
 async def generate_recommend_script(requesting_user):
     """Generates conversational script recommendations using few-shot learning."""
-    
+
     conversation_text = "\n".join(
-        [f"user1: {t}" for t in conversation_history["user1"]] +
-        [f"user2: {t}" for t in conversation_history["user2"]]
+        [f"user1: {t}" for t in conversation_history["user1"]]
+        + [f"user2: {t}" for t in conversation_history["user2"]]
     )
 
     prompt = f"""
@@ -360,9 +378,12 @@ json
     result = await chat_with_ollama(prompt, requesting_user)
 
     # **Ambil hanya rekomendasi untuk user yang diminta**
-    return result if isinstance(result, str) else {"error": "No recommendation available."}
+    return (
+        result if isinstance(result, str) else {"error": "No recommendation available."}
+    )
 
-async def handle_client(websocket, path):
+
+async def handle_client(websocket):
     """Menangani koneksi WebSocket dengan klien"""
     try:
         async for message in websocket:
@@ -372,21 +393,27 @@ async def handle_client(websocket, path):
             if data.get("type") == "handshake":
                 user_id = data["user"]
                 connected_clients[websocket] = user_id  # Simpan user ID
-                print(f"[INFO] Handshake diterima, klien {user_id} terhubung dari {websocket.remote_address}")
+                print(
+                    f"[INFO] Handshake diterima, klien {user_id} terhubung dari {websocket.remote_address}"
+                )
                 continue  # Lewati ke pesan berikutnya
 
             # **Menentukan user saat klien pertama kali terhubung**
             if "user" in data:
                 user_id = data["user"]
                 connected_clients[websocket] = user_id  # Simpan user ID
-                print(f"[INFO] Klien {user_id} terhubung dari {websocket.remote_address}")
+                print(
+                    f"[INFO] Klien {user_id} terhubung dari {websocket.remote_address}"
+                )
 
             if "audio" in data:
                 # Proses audio dengan Whisper
                 response = await process_audio(data)
 
                 # Broadcast hasil transkripsi ke semua klien
-                await asyncio.gather(*(client.send(json.dumps(response)) for client in connected_clients))
+                await asyncio.gather(
+                    *(client.send(json.dumps(response)) for client in connected_clients)
+                )
 
             elif data.get("command") == "get_feedback":
                 print(f"[INFO] Meminta feedback...")
@@ -395,9 +422,13 @@ async def handle_client(websocket, path):
                 # Kirim feedback ke user yang sesuai
                 for client, user in connected_clients.items():
                     if user == "user1":
-                        await client.send(json.dumps({"feedback": feedback.get("user1", "")}))
+                        await client.send(
+                            json.dumps({"feedback": feedback.get("user1", "")})
+                        )
                     elif user == "user2":
-                        await client.send(json.dumps({"feedback": feedback.get("user2", "")}))
+                        await client.send(
+                            json.dumps({"feedback": feedback.get("user2", "")})
+                        )
 
                 print(f"[INFO] Feedback dikirim ke user1 dan user2.")
 
@@ -408,9 +439,13 @@ async def handle_client(websocket, path):
                 # Kirim scoring ke user yang sesuai
                 for client, user in connected_clients.items():
                     if user == "user1":
-                        await client.send(json.dumps({"scoring": scoring.get("user1", "")}))
+                        await client.send(
+                            json.dumps({"scoring": scoring.get("user1", "")})
+                        )
                     elif user == "user2":
-                        await client.send(json.dumps({"scoring": scoring.get("user2", "")}))
+                        await client.send(
+                            json.dumps({"scoring": scoring.get("user2", "")})
+                        )
 
                 print(f"[INFO] Scoring dikirim ke user1 dan user2.")
 
@@ -421,7 +456,9 @@ async def handle_client(websocket, path):
 
                 # Kirim hanya ke user yang meminta
                 if websocket in connected_clients:
-                    await websocket.send(json.dumps({"recommend_script": recommend_script}))
+                    await websocket.send(
+                        json.dumps({"recommend_script": recommend_script})
+                    )
 
                 print(f"[INFO] Rekomendasi script untuk {user} dikirim.")
 
@@ -431,11 +468,13 @@ async def handle_client(websocket, path):
         if websocket in connected_clients:
             del connected_clients[websocket]  # Hapus dari daftar klien yang terhubung
 
+
 async def main():
     """Menjalankan server WebSocket"""
     async with websockets.serve(handle_client, "0.0.0.0", 8000):
         print("Server WebSocket berjalan di ws://localhost:8000")
         await asyncio.Future()  # Menjaga server tetap berjalan
+
 
 if __name__ == "__main__":
     asyncio.run(main())
