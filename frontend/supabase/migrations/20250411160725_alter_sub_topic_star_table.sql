@@ -1,0 +1,2 @@
+ALTER TABLE sub_topic_star
+ADD COLUMN star INT CHECK (star BETWEEN 1 AND 3);
