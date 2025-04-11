@@ -1,8 +1,12 @@
 'use client';
 
+import { signInWithEmail } from '@/api/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Cookies from 'js-cookie';
+import { Eye, EyeOffIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 import { Button } from '../ui/button';
@@ -15,8 +19,7 @@ import {
   FormMessage,
 } from '../ui/form';
 import { Input } from '../ui/input';
-import { Eye, EyeOffIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/auth.context';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -25,8 +28,9 @@ const loginSchema = z.object({
 
 export const LoginForm = () => {
   const [isPasswordShown, setPasswordShown] = useState<boolean>(false);
-  
-  const navigate = useNavigate()
+
+  const auth = useAuth();
+  const navigate = useNavigate();
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -35,9 +39,16 @@ export const LoginForm = () => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof loginSchema>) {
-    console.log(data);
-    navigate("/")
+  async function onSubmit(data: z.infer<typeof loginSchema>) {
+    try {
+      const res = await auth.login({
+        email: data.email,
+        password: data.password,
+      });
+    } catch (error) {
+      console.error('Error signing in:', error);
+      return;
+    }
   }
 
   return (
@@ -69,19 +80,25 @@ export const LoginForm = () => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <div className='flex w-full relative'>
+                <div className="flex w-full relative">
                   <Input
                     id="password"
                     type={isPasswordShown ? 'text' : 'password'}
                     placeholder="Enter Your password"
                     {...field}
                   />
-                  <Button className='absolute right-0' variant={"ghost"} onClick={() => setPasswordShown(!isPasswordShown)} type='button'>
-                    {
-                      isPasswordShown ? <EyeOffIcon className='w-4 h-4'/> : <Eye className='w-4 h-4'/>
-                    }
+                  <Button
+                    className="absolute right-0"
+                    variant={'ghost'}
+                    onClick={() => setPasswordShown(!isPasswordShown)}
+                    type="button"
+                  >
+                    {isPasswordShown ? (
+                      <EyeOffIcon className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
                   </Button>
-                  
                 </div>
               </FormControl>
               <FormMessage />
