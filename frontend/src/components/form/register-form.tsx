@@ -1,6 +1,9 @@
 'use client';
 
+import { signUpNewUser } from '@/api/auth';
+import { useAuth } from '@/context/auth.context';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Cookies from 'js-cookie';
 import { Eye, EyeOffIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -29,7 +32,10 @@ const registerSchema = z.object({
 
 export const RegisterForm = () => {
   const [isPasswordShown, setPasswordShown] = useState<boolean>(false);
-  const [isConfirmPasswordShown, setConfirmPasswordShown] = useState<boolean>(false);
+  const [isConfirmPasswordShown, setConfirmPasswordShown] =
+    useState<boolean>(false);
+
+  const auth = useAuth();
   const navigate = useNavigate();
   const registerForm = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -40,13 +46,23 @@ export const RegisterForm = () => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof registerSchema>) {
+  async function onSubmit(data: z.infer<typeof registerSchema>) {
     console.log(data);
     if (data.password !== data.confirmPaswsword) {
       alert('Password tidak sama');
       return;
     }
-    navigate('/');
+
+    try {
+      await auth.register({
+        email: data.email,
+        password: data.password,
+        name: data.fullName,
+      });
+    } catch (error) {
+      console.error('Error signing in:', error);
+      return;
+    }
   }
   return (
     <Form {...registerForm}>
@@ -80,7 +96,12 @@ export const RegisterForm = () => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input id="email" type="email" placeholder="Masukkan email kamu" {...field} />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Masukkan email kamu"
+                  {...field}
+                />
               </FormControl>
 
               <FormMessage />
@@ -136,7 +157,9 @@ export const RegisterForm = () => {
                   <Button
                     className="absolute right-0"
                     variant={'ghost'}
-                    onClick={() => setConfirmPasswordShown(!isConfirmPasswordShown)}
+                    onClick={() =>
+                      setConfirmPasswordShown(!isConfirmPasswordShown)
+                    }
                     type="button"
                   >
                     {isConfirmPasswordShown ? (
