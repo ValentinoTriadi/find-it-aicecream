@@ -277,7 +277,7 @@ export default function BattleGame() {
         <BattlePopup
           round={round}
           topicName={topicName}
-          onContinue={() => setShowFinalPopup(false)}
+          onContinue={() => window.location.href = '/battle-map'}
           onRetry={() => window.location.reload()}
         />
       )}

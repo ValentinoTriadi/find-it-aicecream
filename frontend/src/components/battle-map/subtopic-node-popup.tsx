@@ -3,13 +3,13 @@
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Progress } from '@/components/ui/progress';
 import { SubTopic } from '@/constant';
 import {
   ArrowRight,
@@ -37,6 +37,7 @@ export function SubtopicNodePopup({
   if (topic == null) return null;
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
+    
       <DialogContent className="bg-white max-w-3xl min-w-xl w-2xl overflow-hidden p-0">
         <div className="bg-dark-blue text-white p-6">
           <DialogHeader>

@@ -29,10 +29,14 @@ export const SubtopicMap = ({ selectedTopic }: SubtopicMapProps) => {
           <Button
             key={topic.id}
             className="flex flex-col items-center rounded-xl"
-            onClick={topic.unlocked ? () => handleOpenSubtopic(topic.id) : function(){}}
+            onClick={
+              topic.unlocked
+                ? () => handleOpenSubtopic(topic.id)
+                : function () {}
+            }
           >
             <div
-              className={`w-24 h-24 rounded-full flex items-center justify-center mb-2 ${topic.unlocked ? 'bg-blue-100 cursor-pointer' : 'bg-gray-200 cursor-not-allowed'}`}
+              className={`w-28 h-28 rounded-full flex items-center justify-center border-[16px] mb-2  ${topic.unlocked ? 'bg-secondary-blue cursor-pointer border-card' : 'bg-gray-200 cursor-not-allowed border-primary-border'}`}
             >
               {topic.unlocked ? (
                 <div className="text-2xl font-bold text-dark-blue">
@@ -42,6 +46,7 @@ export const SubtopicMap = ({ selectedTopic }: SubtopicMapProps) => {
                 <Lock className="w-10 h-10 text-gray-400" />
               )}
             </div>
+
             <div className="text-center">
               <div className="font-medium text-dark-blue">{topic.name}</div>
               {topic.unlocked && (
