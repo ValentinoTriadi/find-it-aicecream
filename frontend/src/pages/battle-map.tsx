@@ -115,7 +115,7 @@ const TOPIC_CATEGORIES: Topic[] = [
   {
     id: 'travel',
     name: 'Travel',
-    icon: <Plane className="w-8 h-8" />,
+    icon: <Plane className="text-primary-blue w-8 h-8" />,
     color: '#5cb176',
     bgColor: '#5cb176',
     subtopic: SUBTOPIC_CATEGORIES,
@@ -124,7 +124,7 @@ const TOPIC_CATEGORIES: Topic[] = [
     id: 'food',
     name: 'Restaurants',
 
-    icon: <Utensils className="w-8 h-8" />,
+    icon: <Utensils className="text-primary-blue w-8 h-8" />,
     color: '#ffc83d',
     bgColor: '#ffc83d',
     subtopic: [],
@@ -133,7 +133,7 @@ const TOPIC_CATEGORIES: Topic[] = [
     id: 'shopping',
     name: 'Shopping',
 
-    icon: <ShoppingBag className="w-8 h-8" />,
+    icon: <ShoppingBag className="text-primary-blue w-8 h-8" />,
     color: '#ef5261',
     bgColor: '#ef5261',
     subtopic: [],
@@ -142,14 +142,14 @@ const TOPIC_CATEGORIES: Topic[] = [
     id: 'essentials',
     name: 'Essentials',
 
-    icon: <Globe className="w-8 h-8" />,
+    icon: <Globe className="text-primary-blue w-8 h-8" />,
     color: '#87ceeb',
     bgColor: '#87ceeb',
     subtopic: SUBTOPIC_CATEGORIES,
   },
 ];
 
-export default function LearnPage() {
+export default function BattlePage() {
   const [isExploring, setIsExploring] = useState(false);
   const [availableTopics, setAvailableTopics] = useState(TOPIC_CATEGORIES);
   const [selectedTopic, setSelectedTopic] = useState(TOPIC_CATEGORIES[0]);
@@ -181,7 +181,7 @@ export default function LearnPage() {
             className={cn(
               isExploring
                 ? 'text-dark-blue flex items-center gap-2'
-                : 'bg-white text-blue-400 border border-blue-400 hover:bg-blue-50',
+                : 'bg-white text-more-stronger-blue border border-more-stronger-blue hover:bg-blue-50',
             )}
             onClick={() => setIsExploring(!isExploring)}
           >
@@ -233,7 +233,7 @@ export default function LearnPage() {
                   Cancel Explore Topic
                 </Button>
                 <Button
-                  className="bg-blue-400 hover:bg-blue-500 text-white"
+                  className="bg-stronger-blue hover:bg-more-stronger-blue text-white"
                   onClick={() => handleCategorySelect(tempSelectedTopic.id)}
                 >
                   Choose Topic
@@ -244,12 +244,12 @@ export default function LearnPage() {
               <>
                 <Button
                   variant="outline"
-                  className="text-blue-400 border-blue-400"
+                  className="text-stronger-blue border-stronger-blue bg-white hover:text-more-stronger-blue hover:border-more-stronger-blue"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Previous Topic
                 </Button>
-                <Button className="bg-blue-400 hover:bg-blue-500 text-white">
+                <Button className="bg-stronger-blue hover:bg-more-stronger-blue text-white">
                   Next Topic
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>

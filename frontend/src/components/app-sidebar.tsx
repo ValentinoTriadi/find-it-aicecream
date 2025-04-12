@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils';
 import { Award, BarChart3, BookOpen, Swords } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -24,10 +25,19 @@ export default function AppSidebar() {
     avatarUrl: '/images/maul.webp',
   });
 
+  const location = useLocation();
+  const isActive = (path: string) => location.pathname === path;
+
   return (
     <Sidebar className="text-white min-h-screen">
       <SidebarHeader className="">
-        <div className="p-4 flex items-center gap-3">
+        <Link
+          to={'/profile'}
+          className={cn(
+            'p-4 flex items-center gap-3 rounded-md',
+            isActive('/profile') && 'bg-white/50 text-dark-blue',
+          )}
+        >
           <div className="w-10 h-10 rounded-full overflow-hidden bg-primary-blue">
             <img
               src={profile.avatarUrl}
@@ -39,7 +49,7 @@ export default function AppSidebar() {
             <h3 className="font-bold">{profile.name}</h3>
             <p className="text-sm text-gray-300">{profile.role}</p>
           </div>
-        </div>
+        </Link>
       </SidebarHeader>
 
       <SidebarContent className="flex flex-col justify-between h-full">
@@ -66,7 +76,7 @@ export default function AppSidebar() {
         </SidebarGroup>
         <SidebarGroup>
           <SidebarItem
-            linkTo={'/achiements'}
+            linkTo={'/achievements'}
             icon={<Award className="w-6 h-6" />}
             label={'Achievement'}
           />

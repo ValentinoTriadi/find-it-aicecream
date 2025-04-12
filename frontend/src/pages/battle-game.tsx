@@ -73,7 +73,7 @@ export default function BattleGame() {
       setMicError('❌ Your voice could not be recognized. Please try again.');
       setMicStarted(false);
       setPlayerTranscript('');
-      stopListening(); 
+      stopListening();
     },
     onSilentTimeout: () => {
       setScriptHintVisible(true);
@@ -86,12 +86,11 @@ export default function BattleGame() {
     },
   });
 
-
-  useEffect(() =>{
-    if(checkGameOver()){
-        setShowFinalPopup(true);   
+  useEffect(() => {
+    if (checkGameOver()) {
+      setShowFinalPopup(true);
     }
-  }, [round])
+  }, [round]);
 
   const endCurrentRound = () => {
     advanceRound();
@@ -216,7 +215,7 @@ export default function BattleGame() {
         <BattlePopup
           round={round}
           topicName={topicName}
-          onContinue={() => setShowFinalPopup(false)}
+          onContinue={() => window.location.href = '/battle-map'}
           onRetry={() => window.location.reload()}
         />
       )}
