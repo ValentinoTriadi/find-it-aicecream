@@ -59,7 +59,7 @@ export default function LandingPage() {
             <Link to="/login">
               <Button
                 variant="outline"
-                className="bg-transparent border-white text-white hover:bg-white/10"
+                className="bg-transparent border-white text-white hover:bg-white/10 hover:text-white"
               >
                 Login
               </Button>
@@ -220,7 +220,7 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="bg-transparent border-white text-white hover:bg-white/10"
+                  className="bg-transparent border-white text-white hover:bg-white/10 hover:text-white"
                 >
                   I Already Have an Account
                 </Button>
@@ -235,34 +235,13 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="w-8 h-8">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-8 h-8"
-                >
-                  <path
-                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                    fill="#1A4A6C"
-                  />
-                  <path
-                    d="M7.5 12.5C7.5 12.5 9 15 12 15C15 15 16.5 12.5 16.5 12.5"
-                    stroke="white"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M7.5 9.5C7.5 9.5 9 7 12 7C15 7 16.5 9.5 16.5 9.5"
-                    stroke="#6EC0F3"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+              <div className="h-8">
+                <img
+                  src="/images/battletalk-logo.png"
+                  alt="BattleTalk Logo"
+                  className="h-full"
+                />
               </div>
-              <span className="font-bold text-xl">BattleTalk</span>
             </div>
 
             <div className="flex gap-6">
