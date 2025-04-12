@@ -1,0 +1,57 @@
+-- Assuming the battle_map table has an id column to reference
+INSERT INTO sub_topic (topic_id, name, description) VALUES
+  (1, 'Sub Topic 1.1', 'This is the first sub-topic of Topic 1.'),
+  (1, 'Sub Topic 1.2', 'This is the second sub-topic of Topic 1.'),
+  (1, 'Sub Topic 1.3', 'This is the third sub-topic of Topic 1.'),
+  (1, 'Sub Topic 1.4', 'This is the fourth sub-topic of Topic 1.'),
+  (1, 'Sub Topic 1.5', 'This is the fifth sub-topic of Topic 1.'),
+  (1, 'Sub Topic 1.6', 'This is the sixth sub-topic of Topic 1.'),
+  
+  (2, 'Sub Topic 2.1', 'This is the first sub-topic of Topic 2.'),
+  (2, 'Sub Topic 2.2', 'This is the second sub-topic of Topic 2.'),
+  (2, 'Sub Topic 2.3', 'This is the third sub-topic of Topic 2.'),
+  (2, 'Sub Topic 2.4', 'This is the fourth sub-topic of Topic 2.'),
+  (2, 'Sub Topic 2.5', 'This is the fifth sub-topic of Topic 2.'),
+  (2, 'Sub Topic 2.6', 'This is the sixth sub-topic of Topic 2.'),
+  
+  (3, 'Sub Topic 3.1', 'This is the first sub-topic of Topic 3.'),
+  (3, 'Sub Topic 3.2', 'This is the second sub-topic of Topic 3.'),
+  (3, 'Sub Topic 3.3', 'This is the third sub-topic of Topic 3.'),
+  (3, 'Sub Topic 3.4', 'This is the fourth sub-topic of Topic 3.'),
+  (3, 'Sub Topic 3.5', 'This is the fifth sub-topic of Topic 3.'),
+  (3, 'Sub Topic 3.6', 'This is the sixth sub-topic of Topic 3.'),
+  
+  (4, 'Sub Topic 4.1', 'This is the first sub-topic of Topic 4.'),
+  (4, 'Sub Topic 4.2', 'This is the second sub-topic of Topic 4.'),
+  (4, 'Sub Topic 4.3', 'This is the third sub-topic of Topic 4.'),
+  (4, 'Sub Topic 4.4', 'This is the fourth sub-topic of Topic 4.'),
+  (4, 'Sub Topic 4.5', 'This is the fifth sub-topic of Topic 4.'),
+  (4, 'Sub Topic 4.6', 'This is the sixth sub-topic of Topic 4.'),
+  
+  (5, 'Sub Topic 5.1', 'This is the first sub-topic of Topic 5.'),
+  (5, 'Sub Topic 5.2', 'This is the second sub-topic of Topic 5.'),
+  (5, 'Sub Topic 5.3', 'This is the third sub-topic of Topic 5.'),
+  (5, 'Sub Topic 5.4', 'This is the fourth sub-topic of Topic 5.'),
+  (5, 'Sub Topic 5.5', 'This is the fifth sub-topic of Topic 5.'),
+  (5, 'Sub Topic 5.6', 'This is the sixth sub-topic of Topic 5.'),
+  
+  (6, 'Sub Topic 6.1', 'This is the first sub-topic of Topic 6.'),
+  (6, 'Sub Topic 6.2', 'This is the second sub-topic of Topic 6.'),
+  (6, 'Sub Topic 6.3', 'This is the third sub-topic of Topic 6.'),
+  (6, 'Sub Topic 6.4', 'This is the fourth sub-topic of Topic 6.'),
+  (6, 'Sub Topic 6.5', 'This is the fifth sub-topic of Topic 6.'),
+  (6, 'Sub Topic 6.6', 'This is the sixth sub-topic of Topic 6.'),
+  
+  (7, 'Sub Topic 7.1', 'This is the first sub-topic of Topic 7.'),
+  (7, 'Sub Topic 7.2', 'This is the second sub-topic of Topic 7.'),
+  (7, 'Sub Topic 7.3', 'This is the third sub-topic of Topic 7.'),
+  (7, 'Sub Topic 7.4', 'This is the fourth sub-topic of Topic 7.'),
+  (7, 'Sub Topic 7.5', 'This is the fifth sub-topic of Topic 7.'),
+  (7, 'Sub Topic 7.6', 'This is the sixth sub-topic of Topic 7.'),
+  
+  (8, 'Sub Topic 8.1', 'This is the first sub-topic of Topic 8.'),
+  (8, 'Sub Topic 8.2', 'This is the second sub-topic of Topic 8.'),
+  (8, 'Sub Topic 8.3', 'This is the third sub-topic of Topic 8.'),
+  (8, 'Sub Topic 8.4', 'This is the fourth sub-topic of Topic 8.'),
+  (8, 'Sub Topic 8.5', 'This is the fifth sub-topic of Topic 8.'),
+  (8, 'Sub Topic 8.6', 'This is the sixth sub-topic of Topic 8.');

@@ -2,6 +2,7 @@ import AchievementTab from '@/components/profile/AchievementTab';
 import LevelProgress from '@/components/profile/LevelProgress';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import StatsTab from '@/components/profile/StatsTab';
+import { useAuth } from '@/context/auth.context';
 import {
   Award,
   BarChart2,
@@ -69,6 +70,7 @@ const DummyAchievements = [
   },
 ];
 const ProfilePage = () => {
+  const auth = useAuth();
   const [activeTab, setActiveTab] = useState<'Stats' | 'Achievement'>('Stats');
   const [userData, setUserData] = useState(DummyUserData);
   const [achievements, setAchievements] = useState(DummyAchievements);
@@ -77,10 +79,11 @@ const ProfilePage = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Profile Header */}
         <ProfileHeader
-          name={userData.name}
+          name={auth.user?.user_metadata?.name}
           joinDate={userData.joinDate}
           achievementsUnlocked={userData.achievementsUnlocked}
           exp={userData.exp}
+          handleLogout={() => auth.logout()}
         />
 
         {/* Level Progress */}
