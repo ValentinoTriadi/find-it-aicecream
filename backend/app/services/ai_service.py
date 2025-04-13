@@ -317,3 +317,107 @@ class AIService:
             if isinstance(result, str)
             else {"error": "No recommendation available."}
         )
+    
+    async def generate_objective_scoring(self, topic, conversation, role, objective):
+        """Evaluates if the objectives for each user were achieved based on roles, topic, and expected objectives."""
+
+        prompt = f"""
+        You are a role-based conversation evaluator. Your task is to determine whether each user's objectives were achieved based on their assigned role within a topic.
+
+        ### Examples (Few-Shot Learning)
+
+        #### Example 1
+        **Topic:** Restaurant
+        **Role:**
+        user1: waiter
+        user2: customer
+        **Objective:**
+        user1: greeting, offer_menu, confirm_order
+        user2: respond_greeting, order_food, confirm_order
+
+        **Conversation:**
+        user1: "Hello! Welcome to our restaurant."
+        user2: "Thank you! I'd like to have a table for two."
+        user1: "Sure, follow me please. Would you like to start with something to drink?"
+        user2: "Yes, a glass of water, please."
+        user1: "And for the main course?"
+        user2: "I'll have the grilled salmon."
+        user1: "Perfect. I’ll get that ready for you."
+
+        **Expected JSON Output:**
+        ```json
+        {{
+            "objectives": {{
+                "user1": {{
+                    "greeting": true,
+                    "offer_menu": true,
+                    "confirm_order": true
+                }},
+                "user2": {{
+                    "respond_greeting": true,
+                    "order_food": true,
+                    "confirm_order": true
+                }}
+            }}
+        }}
+        ```
+
+        #### Example 2
+        **Topic:** Job Interview
+        **Role:**
+        user1: interviewer
+        user2: candidate
+        **Objective:**
+        user1: ask_questions, evaluate_candidate
+        user2: present_self, express_motivation
+
+        **Conversation:**
+        user1: "Can you tell me about yourself?"
+        user2: "Sure. I recently graduated in Computer Science and I’m passionate about backend development."
+        user1: "Why do you want to work at our company?"
+        user2: "Because I admire your innovation in AI and want to contribute to impactful projects."
+        user1: "That’s great to hear. We’ll be in touch."
+
+        **Expected JSON Output:**
+        ```json
+        {{
+            "objectives": {{
+                "user1": {{
+                    "ask_questions": true,
+                    "evaluate_candidate": true
+                }},
+                "user2": {{
+                    "present_self": true,
+                    "express_motivation": true
+                }}
+            }}
+        }}
+        ```
+
+        ---
+
+        ### Now, analyze the following:
+
+        **Topic:** {topic}
+        **Role:** {json.dumps(role, indent=4)}
+        **Objective:** {json.dumps(objective, indent=4)}
+        **Conversation:**
+        {conversation}
+
+        **Instructions:**
+        - Determine if each user met the expected objectives for their role.
+        - Evaluate their actions and responses in context.
+        - Output ONLY in the following JSON format:
+
+        ```json
+        {{
+            "objectives": {{
+                "user1": {{ "<objective_name>": true/false, ... }},
+                "user2": {{ "<objective_name>": true/false, ... }}
+            }}
+        }}
+        ```
+        """
+
+        result = await self.chat_with_ollama(prompt)
+        return result.get("objectives", {"error": "No objective scoring available."})
