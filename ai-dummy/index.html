@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BattleTalk 1vs1</title>
+</head>
+<body>
+    <h2>BattleTalk 1vs1</h2>
+    
+    <label for="userId">Pilih User:</label>
+    <select id="userId">
+        <option value="user1">User 1</option>
+        <option value="user2">User 2</option>
+    </select>
+    
+    <button id="startRecording">Mulai Bicara</button>
+    <button id="stopRecording" disabled>Berhenti & Kirim</button>
+    <audio id="audioPlayer" controls></audio>
+    
+    <button id="getFeedback">Dapatkan Feedback</button>
+    <button id="getScoring">Dapatkan Skor</button>
+    <button id="getRecommendScript">Dapatkan Rekomendasi</button>
+
+    <div id="result"></div>
+    <div id="transcription">
+        <p><strong>Transkripsi:</strong></p>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let ws = null;
+        let userId = "user1"; // Default User 1
+        let audioStream;
+
+        document.getElementById("userId").addEventListener("change", (e) => {
+            userId = e.target.value;
+            console.log("User ID Changed:", userId);
+        });
+
+        async function initAudioStream() {
+            if (!audioStream) {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
+        }
+
+        function connectWebSocket() {
+            if (ws && ws.readyState === WebSocket.OPEN) return; // Hindari duplikasi koneksi
+            
+            ws = new WebSocket("ws://localhost:8000");
+            
+            ws.onopen = () => {
+                console.log("WebSocket Connected");
+
+                // Kirim pesan handshake ke server
+                ws.send(JSON.stringify({ type: "handshake", user: userId }));
+                console.log(`Sent handshake: user=${userId}`);
+            };
+
+            ws.onerror = error => console.error("WebSocket Error:", error);
+            ws.onclose = () => console.log("WebSocket Closed");
+
+            ws.onmessage = event => {
+                console.log("Received:", event.data);
+                let data = JSON.parse(event.data);
+                
+                if (data.error) {
+                    console.error("Error:", data.error);
+                    return;
+                }
+
+                let transcriptDiv = document.getElementById("transcription");
+                let newMessageText = `${data.user}: ${data.text}`;
+
+                // Jika data.text kosong, tidak perlu menambahkannya ke UI
+                if (!data.text) {
+                    console.warn("Received empty text, skipping UI update.");
+                } else {
+                    // Cek apakah teks sudah ada di UI untuk mencegah duplikasi
+                    if (![...transcriptDiv.getElementsByTagName("p")].some(p => p.textContent === newMessageText)) {
+                        let newMessage = document.createElement("p");
+                        newMessage.textContent = newMessageText;
+                        transcriptDiv.appendChild(newMessage);
+                    }
+                }
+
+                let resultDiv = document.getElementById("result");
+                if (data.feedback) {
+                    resultDiv.innerHTML = `<p><strong>Feedback:</strong> ${JSON.stringify(data.feedback)}</p>`;
+                } 
+                if (data.scoring) {
+                    resultDiv.innerHTML += `<p><strong>Scoring:</strong> ${JSON.stringify(data.scoring)}</p>`;
+                } 
+                if (data.recommend_script) {
+                    resultDiv.innerHTML += `<p><strong>Recommend Script:</strong> ${JSON.stringify(data.recommend_script)}</p>`;
+                }
+            };
+        }
+
+        document.getElementById("startRecording").addEventListener("click", async () => {
+
+            mediaRecorder = new MediaRecorder(audioStream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                let audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+                let audioUrl = URL.createObjectURL(audioBlob);
+                document.getElementById("audioPlayer").src = audioUrl;
+
+                // Konversi ke Base64
+                let reader = new FileReader();
+                reader.readAsDataURL(audioBlob);
+                reader.onloadend = () => {
+                    let base64Audio = reader.result.split(',')[1];
+
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ user: userId, audio: base64Audio }));
+                    } else {
+                        console.error("WebSocket belum siap");
+                    }
+                };
+            };
+
+            mediaRecorder.start();
+            document.getElementById("startRecording").disabled = true;
+            document.getElementById("stopRecording").disabled = false;
+        });
+
+        document.getElementById("stopRecording").addEventListener("click", () => {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+                document.getElementById("startRecording").disabled = false;
+                document.getElementById("stopRecording").disabled = true;
+            }
+        });
+
+        function sendCommand(command) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ command }));
+            } else {
+                console.error("WebSocket belum siap, coba lagi.");
+            }
+        }
+
+        document.getElementById("getFeedback").addEventListener("click", () => sendCommand("get_feedback"));
+        document.getElementById("getScoring").addEventListener("click", () => sendCommand("get_scoring"));
+        document.getElementById("getRecommendScript").addEventListener("click", () => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ command: "get_recommend_script", user: userId }));
+                console.log("Requesting recommend script for", userId);
+            } else {
+                console.error("WebSocket not connected.");
+            }
+        });
+
+        // Inisialisasi
+        connectWebSocket();
+        initAudioStream();
+    </script>    
+</body>
+</html>
