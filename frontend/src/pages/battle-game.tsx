@@ -11,7 +11,7 @@ import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { cn } from '@/lib/utils';
 import Button from '@mui/material/Button';
 import { Info, Pause } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 const TOTAL_ROUNDS = 1;
@@ -36,6 +36,9 @@ export default function BattleGame() {
   const [micError, setMicError] = useState('');
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   const [showPausePopup, setShowPausePopup] = useState(false);
+  const [conversation, setConversation] = useState<any[]>([]);
+
+  const socketRef = useRef<WebSocket | null>(null);
 
   const {
     round,
@@ -73,7 +76,7 @@ export default function BattleGame() {
       setMicError('❌ Your voice could not be recognized. Please try again.');
       setMicStarted(false);
       setPlayerTranscript('');
-      stopListening(); 
+      stopListening();
     },
     onSilentTimeout: () => {
       setScriptHintVisible(true);
@@ -86,14 +89,23 @@ export default function BattleGame() {
     },
   });
 
-
-  useEffect(() =>{
-    if(checkGameOver()){
-        setShowFinalPopup(true);   
+  useEffect(() => {
+    if (checkGameOver()) {
+      setShowFinalPopup(true);
     }
-  }, [round])
+  }, [round]);
 
   const endCurrentRound = () => {
+    const text = playerTranscript;
+    sendMessage({
+      type: 'playerTurn',
+      data: {
+        round,
+        player: currentPlayer,
+        transcript: text,
+      },
+    });
+
     advanceRound();
     setPlayerTranscript('');
     setMicStarted(false);
@@ -117,6 +129,55 @@ export default function BattleGame() {
 
   const handleSubmit = () => {
     endCurrentRound();
+  };
+
+  useEffect(() => {
+    const socket = new WebSocket(
+      import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/1',
+    ); // 1 for room_id 1 (static)
+    socketRef.current = socket;
+
+    socket.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      console.log('Received message:', message);
+
+      // Handle incoming messages
+      setConversation((prev) => {
+        const updatedConversation = [...prev, message];
+        console.log('Updated conversation:', updatedConversation); // Logs the correct updated state
+        return updatedConversation;
+      });
+    };
+
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
+  const sendMessage = (data: any) => {
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      console.log('Sending message:', data);
+
+      try {
+        socketRef.current.send(JSON.stringify(data));
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
+    } else {
+      console.error('WebSocket is not open');
+    }
   };
 
   return (
