@@ -1,10 +1,13 @@
-import { Trophy, Star, Edit } from 'lucide-react';
+import { Edit, LogOut, Star, Trophy } from 'lucide-react';
+
+import { Button } from '../ui/button';
 
 interface ProfileHeaderProps {
   name: string;
   joinDate: string;
   achievementsUnlocked: number;
   exp: number;
+  handleLogout: () => void;
 }
 
 export default function ProfileHeader({
@@ -12,6 +15,7 @@ export default function ProfileHeader({
   joinDate,
   achievementsUnlocked,
   exp,
+  handleLogout,
 }: ProfileHeaderProps) {
   return (
     <div className="rounded-xl overflow-hidden bg-card">
@@ -37,10 +41,14 @@ export default function ProfileHeader({
               </div>
             </div>
           </div>
-          <button className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-md border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            <Edit className="w-4 h-4" />
-            Edit Profile
-          </button>
+          <Button
+            onClick={handleLogout}
+            variant={'ghost'}
+            className="flex items-center gap-1 px-3 py-1.5 border-destructive bg-card text-destructive  rounded-md border text-sm font-medium hover:text-destructive  hover:bg-red-200"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
         </div>
       </div>
     </div>
