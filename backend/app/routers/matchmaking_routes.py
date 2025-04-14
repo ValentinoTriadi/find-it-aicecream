@@ -1,5 +1,5 @@
 from fastapi import APIRouter, WebSocket, Query
-from services.matchmaking_service import MatchmakingService
+from app.services.matchmaking_service import MatchmakingService
 import json
 import asyncio
 

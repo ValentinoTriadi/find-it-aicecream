@@ -13,6 +13,14 @@ services:
     image: battletalk-frontend
     env_file:
       - frontend/.env
+    environment:
+      - VITE_SUPABASE_URL
+      - VITE_SUPABASE_ANON_KEY
+      - SUPABASE_DB_PASSWORD
+      - VITE_AGORA_APP_ID
+      - VITE_AGORA_CHANNEL_NAME
+      - VITE_AGORA_TOKEN
+      - VITE_WS_URL
     build:
       context: ./frontend
       dockerfile: Dockerfile

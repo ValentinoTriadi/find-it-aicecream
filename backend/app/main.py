@@ -24,7 +24,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from app.routers import api_routes, websocket_routes
+from app.routers import api_routes, matchmaking_routes, battle_routes
 
 app = FastAPI()
 
@@ -36,6 +36,7 @@ app.add_middleware(
     allow_credentials=True,
 )
 
+app.include_router(api_routes.router)
 app.include_router(matchmaking_routes.router)
 app.include_router(battle_routes.router)
 
