@@ -1,4 +1,4 @@
-import { BarChart2, Swords, Star } from 'lucide-react';
+import { BarChart2, Star, Swords } from 'lucide-react';
 
 interface StatsTabProps {
   skills: Record<string, number>;
@@ -45,15 +45,21 @@ export default function StatsTab({ skills, battleStats }: StatsTabProps) {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Battles Won</span>
-            <span className="font-medium text-dark-blue">{battleStats.battlesWon}</span>
+            <span className="font-medium text-dark-blue">
+              {battleStats.battlesWon}
+            </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Battle Star</span>
-            <span className="font-medium text-dark-blue">{battleStats.battleStars}</span>
+            <span className="font-medium text-dark-blue">
+              {battleStats.battleStars}
+            </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Average Score</span>
-            <span className="font-medium text-dark-blue">{battleStats.averageScore}%</span>
+            <span className="font-medium text-dark-blue">
+              {battleStats.averageScore}%
+            </span>
           </div>
         </div>
       </div>

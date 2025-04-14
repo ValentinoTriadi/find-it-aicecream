@@ -8,19 +8,18 @@ export interface Topic {
 }
 
 export interface SubTopic {
-    id: number;
+  id: number;
+  name: string;
+  level: string;
+  description: string;
+  points: number;
+  stars: number;
+  unlocked: boolean;
+  battleWon: number;
+  averageTime: number;
+  bestScore: number;
+  roles: {
     name: string;
-    level: string;
-    description: string;
-    points: number;
-    stars: number;
-    unlocked: boolean;
-    battleWon: number;
-    averageTime: number; 
-    bestScore: number; 
-    roles: {
-      name: string;
-      desc: string;
-    }[];
-  }
-  
+    desc: string;
+  }[];
+}

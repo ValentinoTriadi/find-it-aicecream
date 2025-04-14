@@ -14,7 +14,9 @@ export function useMatchmaking(topicId: string, subTopicId: string) {
   const startMatchmaking = () => {
     console.log('Starting matchmaking...');
 
-    const wsUrl = `ws://localhost:8000/ws?topic_id=${topicId}&subtopic_id=${subTopicId}`;
+    const wsUrl =
+      import.meta.env.VITE_WS_URL +
+      `/ws?topic_id=${topicId}&subtopic_id=${subTopicId}`;
     const socket = new WebSocket(wsUrl);
 
     socketRef.current = socket;

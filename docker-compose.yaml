@@ -2,13 +2,11 @@ version: '3.8'
 services:
   backend:
     image: battletalk-backend
-    env_file:
-      - backend/.env
     build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "5001:5001"
+      - "8181:8181"
     volumes:
       - ./backend:/backend
 
@@ -20,20 +18,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3131:3131"
     volumes:
       - ./frontend:/frontend
-    depends_on:
-      - backend
-
-  ai:
-    image: battletalk-ai
-    build:
-      context: ./ai-dummy
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./ai:/ai
     depends_on:
       - backend

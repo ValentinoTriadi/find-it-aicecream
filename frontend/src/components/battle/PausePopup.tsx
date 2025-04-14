@@ -43,13 +43,15 @@ export default function PausePopup({
           <div className="flex justify-between gap-4 w-full">
             <Button
               onClick={onRestart}
-              className="flex flex-col gap-1 justify-center  border border-stronger-blue text-stronger-blue px-4 py-6 min-w-32 rounded" variant={"outline"}
+              className="flex flex-col gap-1 justify-center  border border-stronger-blue text-stronger-blue px-4 py-6 min-w-32 rounded"
+              variant={'outline'}
             >
               <Repeat /> Restart
             </Button>
             <Button
               onClick={onExit}
-              className="flex flex-col gap-1 justify-center  border border-stronger-blue text-stronger-blue px-4 py-6 min-w-32 rounded" variant={"outline"}
+              className="flex flex-col gap-1 justify-center  border border-stronger-blue text-stronger-blue px-4 py-6 min-w-32 rounded"
+              variant={'outline'}
             >
               <Home /> Exit Game
             </Button>

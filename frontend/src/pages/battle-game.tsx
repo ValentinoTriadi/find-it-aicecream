@@ -27,7 +27,7 @@ const staticTopicMap: Record<string, string> = {
 
 export default function BattleGame() {
   const { topicId } = useParams<{ topicId: string }>();
-  const {subtopicId} = useParams<{ subtopicId: string }>();
+  const { subtopicId } = useParams<{ subtopicId: string }>();
   const topicName = staticTopicMap[topicId ?? ''] ?? 'Unknown Topic';
 
   const [scriptHintVisible, setScriptHintVisible] = useState(false);
@@ -134,7 +134,7 @@ export default function BattleGame() {
 
   useEffect(() => {
     const socket = new WebSocket(
-      import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/1/1',
+      import.meta.env.VITE_WS_URL + '/ws/1/1' || 'ws://localhost:8181/ws/1/1',
     ); // 1 for room_id 1 (static)
     socketRef.current = socket;
 
@@ -278,7 +278,7 @@ export default function BattleGame() {
         <BattlePopup
           round={round}
           topicName={topicName}
-          onContinue={() => window.location.href = '/battle-map'}
+          onContinue={() => (window.location.href = '/battle-map')}
           onRetry={() => window.location.reload()}
         />
       )}

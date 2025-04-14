@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 @tailwind utilities;
 @custom-variant dark (&:is(.dark *));
 
@@ -7,16 +7,16 @@ body,
 html {
   margin: 0 auto;
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 ::-webkit-scrollbar {
@@ -147,17 +147,17 @@ code {
   }
 }
 
-@theme{
-  --color-dark-blue : #1A4A6C;
-  --color-primary-blue : #EDFCF8;
-  --color-secondary-blue : #DAF4F4;
-  --color-card : #B9E2EE;
-  --color-background : #FDFDFE;
-  --color-stronger-blue : #6EC0F3;
-  --color-more-stronger-blue : #17A6FF;
-  --color-primary-border: #9D9D9D;
-  --color-primary-border-fg : #6C6C6C;
-  --color-yellow-star : #FFD24E;  
+@theme {
+  --color-dark-blue: #1a4a6c;
+  --color-primary-blue: #edfcf8;
+  --color-secondary-blue: #daf4f4;
+  --color-card: #b9e2ee;
+  --color-background: #fdfdfe;
+  --color-stronger-blue: #6ec0f3;
+  --color-more-stronger-blue: #17a6ff;
+  --color-primary-border: #9d9d9d;
+  --color-primary-border-fg: #6c6c6c;
+  --color-yellow-star: #ffd24e;
 
   --text-title-hero: 4.5rem;
   --text-title-hero-line: 5.4rem;
@@ -205,4 +205,3 @@ code {
   --text-body-small-strong-line: 1.225rem;
   --font-weight-body-small-strong-weight: 600;
 }
-

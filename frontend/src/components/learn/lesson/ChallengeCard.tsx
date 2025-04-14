@@ -1,8 +1,7 @@
 // src/pages/lesson/challenge.tsx
-
-import { cn } from "../../../lib/utils";
-import { Card } from "./LessonCard";
-import { QuestionBubble } from "./QuestionBubble";
+import { cn } from '../../../lib/utils';
+import { Card } from './LessonCard';
+import { QuestionBubble } from './QuestionBubble';
 
 type ChallengeProps = {
   options: {
@@ -12,7 +11,7 @@ type ChallengeProps = {
   }[];
   question: string;
   onSelect: (id: number) => void;
-  status: "correct" | "wrong" | "none" | "completed";
+  status: 'correct' | 'wrong' | 'none' | 'completed';
   selectedOption?: number;
   disabled?: boolean;
 };
@@ -28,7 +27,12 @@ export const ChallengeCard = ({
   return (
     <div>
       <QuestionBubble question={question} />
-      <div className={cn("grid gap-2", "grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(0,1fr))]")}>
+      <div
+        className={cn(
+          'grid gap-2',
+          'grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(0,1fr))]',
+        )}
+      >
         {options.map((option) => (
           <Card
             key={option.id}

@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { SubTopic, Topic } from '@/constant';
-import { useMatchmaking } from '@/hooks/useMatchMaking';
+import { useMatchmaking } from '@/hooks/useMatchmaking';
 import {
   ArrowRight,
   BookOpen,
@@ -37,7 +37,6 @@ export function SubtopicNodePopup({
   topic,
   selectedSubtopic,
 }: TopicNodePopupProps) {
-  
   if (topic == null) return null;
   if (selectedSubtopic == null) return null;
 

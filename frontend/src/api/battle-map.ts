@@ -9,7 +9,7 @@ export async function getAllTopic() {
 
   return data;
 }
-export async function getTopicById(id: Number) {
+export async function getTopicById(id: number) {
   const { data, error } = await supabase
     .from('topic')
     .select('*')
@@ -22,7 +22,7 @@ export async function getTopicById(id: Number) {
 
   return data;
 }
-export async function getAllSubTopic(topicId: Number) {
+export async function getAllSubTopic(topicId: number) {
   const { data, error } = await supabase
     .from('sub_topic')
     .select('*')
@@ -34,7 +34,7 @@ export async function getAllSubTopic(topicId: Number) {
 
   return data;
 }
-export async function getSubTopicById(id: Number) {
+export async function getSubTopicById(id: number) {
   const { data, error } = await supabase
     .from('sub_topic')
     .select('*')
@@ -47,7 +47,7 @@ export async function getSubTopicById(id: Number) {
 
   return data;
 }
-export async function getAllSubTopicWithStar(topicId: Number) {
+export async function getAllSubTopicWithStar(topicId: number) {
   const { data, error } = await supabase
     .from('sub_topic')
     .select('*, sub_topic_star(*)')
@@ -60,7 +60,7 @@ export async function getAllSubTopicWithStar(topicId: Number) {
   return data;
 }
 export async function getAllSubTopicWithStarByUserId(
-  topicId: Number,
+  topicId: number,
   userId: string,
 ) {
   const { data, error } = await supabase
@@ -114,23 +114,24 @@ export async function getVictoryUser(userId: string) {
   return vic;
 }
 /**
- * 
+ *
  * @param topicId Topic ID
  * @param userId User ID
- * @returns The last sub-topic ID within the topic that has been completed. If no sub-topic has been completed, returns -1. 
+ * @returns The last sub-topic ID within the topic that has been completed. If no sub-topic has been completed, returns -1.
  */
 export async function getLastSubTopicDone(topicId: number, userId: string) {
   const { data, error } = await supabase
     .from('sub_topic_star')
     .select('sub_topic_id')
     .eq('user_id', userId)
-    .in('sub_topic_id', (await supabase
-      .from('sub_topic')
-      .select('id')
-      .eq('topic_id', topicId)
-    ).data?.map((subTopic) => subTopic.id) || [])
+    .in(
+      'sub_topic_id',
+      (
+        await supabase.from('sub_topic').select('id').eq('topic_id', topicId)
+      ).data?.map((subTopic) => subTopic.id) || [],
+    )
     .order('sub_topic_id', { ascending: false })
-    .limit(1)
+    .limit(1);
 
   if (error) {
     throw new Error(error.message);
