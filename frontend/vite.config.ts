@@ -6,6 +6,9 @@ import prettier from 'vite-plugin-prettier';
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), prettier()],
+  server: {
+    port: 3131,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

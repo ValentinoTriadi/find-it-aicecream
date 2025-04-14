@@ -11,11 +11,11 @@ COPY . /app
 RUN apt update && apt install -y ffmpeg
 
 # Install semua dependensi Python
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Expose port WebSocket
 EXPOSE 8181
 
 # Jalankan server WebSocket
 RUN cd app
-CMD ["python", '-m', "main"]
+CMD ["python", "-m", "main"]
