@@ -1,5 +1,5 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
-from services.websocket_service import WebsocketService
+from app.services.websocket_service import WebsocketService
 import json
 
 router = APIRouter()

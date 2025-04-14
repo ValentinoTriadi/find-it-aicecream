@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from services.ai_service import AIService
+from app.services.ai_service import AIService
 
 
 router = APIRouter()

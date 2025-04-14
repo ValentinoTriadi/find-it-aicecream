@@ -1,5 +1,5 @@
 # Gunakan image Python resmi
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 # Set lingkungan kerja dalam container
 WORKDIR /app
@@ -11,11 +11,10 @@ COPY . /app
 RUN apt update && apt install -y ffmpeg
 
 # Install semua dependensi Python
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose port WebSocket
 EXPOSE 8181
 
 # Jalankan server WebSocket
-RUN cd app
-CMD ["python", "-m", "main"]
+CMD ["python", "-m", "app.main"]
