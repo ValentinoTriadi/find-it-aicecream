@@ -44,11 +44,11 @@ export function SubtopicNodePopup({
   const { status, roomId, startMatchmaking } = useMatchmaking(
     topic.id.toString(),
     selectedSubtopic.id?.toString() || topic.id.toString(),
-  );
+);
 
   useEffect(() => {
     if (status === 'matched' && roomId) {
-      navigate(`/battle/${roomId}/${selectedSubtopic.id}`);
+      navigate(`/battle/${roomId}/${topic.id}/${selectedSubtopic.id}`);
     }
   }, [status, roomId, navigate]);
 
