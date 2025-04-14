@@ -27,7 +27,7 @@ function App() {
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/achievements" element={<AchievementsPage />} />
       </Route>
-      <Route path="/battle/:topicId" element={<BattleGame />} />
+      <Route path="/battle/:topicId/:subtopicId" element={<BattleGame />} />
     </Routes>
   );
 }

@@ -150,6 +150,10 @@ const TOPIC_CATEGORIES: Topic[] = [
 ];
 
 export default function BattlePage() {
+  const isSpeechRecognitionSupported =
+    typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
   const [isExploring, setIsExploring] = useState(false);
   const [availableTopics, setAvailableTopics] = useState(TOPIC_CATEGORIES);
   const [selectedTopic, setSelectedTopic] = useState(TOPIC_CATEGORIES[0]);
@@ -171,6 +175,12 @@ export default function BattlePage() {
 
   return (
     <div className="min-h-screen bg-background p-6">
+      {!isSpeechRecognitionSupported && (
+        <div className="bg-red-100 text-red-700 px-4 py-2 rounded-md mb-4">
+          ⚠️ Your browser does not support voice recognition features. Please
+          use Chrome or another supported browser for the best experience.
+        </div>
+      )}
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-dark-blue">

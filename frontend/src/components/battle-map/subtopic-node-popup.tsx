@@ -10,7 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { SubTopic } from '@/constant';
+import { SubTopic, Topic } from '@/constant';
+import { useMatchmaking } from '@/hooks/useMatchMaking';
 import {
   ArrowRight,
   BookOpen,
@@ -20,24 +21,51 @@ import {
   Swords,
   Trophy,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface TopicNodePopupProps {
   isOpen: boolean;
   onClose: () => void;
-  topic: SubTopic | null;
+  topic: Topic;
+  selectedSubtopic: SubTopic | null;
 }
 
 export function SubtopicNodePopup({
   isOpen,
   onClose,
   topic,
+  selectedSubtopic,
 }: TopicNodePopupProps) {
-  // Sample vocabulary words for the topic
+  
   if (topic == null) return null;
+  if (selectedSubtopic == null) return null;
+
+  const navigate = useNavigate();
+  const { status, roomId, startMatchmaking } = useMatchmaking(
+    topic.id.toString(),
+    selectedSubtopic.id?.toString() || topic.id.toString(),
+  );
+
+  useEffect(() => {
+    if (status === 'matched' && roomId) {
+      navigate(`/battle/${roomId}/${selectedSubtopic.id}`);
+    }
+  }, [status, roomId, navigate]);
+
+  function HandleMatchmaking() {
+    startMatchmaking();
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-    
+    <Dialog
+      open={isOpen}
+      onOpenChange={(val) => {
+        if (status !== 'searching') {
+          onClose();
+        }
+      }}
+    >
       <DialogContent className="bg-white max-w-3xl min-w-xl w-2xl overflow-hidden p-0">
         <div className="bg-dark-blue text-white p-6">
           <DialogHeader>
@@ -46,19 +74,19 @@ export function SubtopicNodePopup({
                 <div className="w-16 h-16 rounded-full bg-primary-blue flex items-center justify-center">
                   <div className="w-12 h-12 rounded-full bg-stronger-blue flex items-center justify-center">
                     <span className="text-white font-bold text-xl">
-                      {topic.level}
+                      {selectedSubtopic.level}
                     </span>
                   </div>
                 </div>
                 <div>
                   <DialogTitle className="text-2xl font-bold">
-                    {topic.name}
+                    {selectedSubtopic.name}
                   </DialogTitle>
                   <div className="flex mt-2">
                     {[...Array(3)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-5 h-5 ${i < topic.stars ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'}`}
+                        className={`w-5 h-5 ${i < selectedSubtopic.stars ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400'}`}
                       />
                     ))}
                   </div>
@@ -76,11 +104,11 @@ export function SubtopicNodePopup({
                 className="text-base
             "
               >
-                {topic.points}
+                {selectedSubtopic.points}
               </div>
             </div>
-            {topic.description ||
-              `Learn essential vocabulary and phrases for ${topic.name.toLowerCase()} situations. Practice conversations and improve your speaking skills.`}
+            {selectedSubtopic.description ||
+              `Learn essential vocabulary and phrases for ${selectedSubtopic.name.toLowerCase()} situations. Practice conversations and improve your speaking skills.`}
           </DialogDescription>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -118,8 +146,11 @@ export function SubtopicNodePopup({
           <div className="flex flex-col gap-2 mb-5">
             <h1 className="text-base font-semibold">Roles</h1>
             <ul className="bg-background rounded-[10px] flex flex-col py-3 gap-1">
-              {topic.roles.map((role, index) => (
-                <li className="flex flex-row gap-3 items-start px-2" key={index}>
+              {selectedSubtopic.roles.map((role, index) => (
+                <li
+                  className="flex flex-row gap-3 items-start px-2"
+                  key={index}
+                >
                   <div className="h-7 w-7 p-1 flex items-center justify-center bg-stronger-blue rounded-full">
                     <span className=" line-clamp-none text-white text-base">
                       {index + 1}
@@ -138,19 +169,29 @@ export function SubtopicNodePopup({
 
           <DialogFooter className="flex justify-between items-center pt-4 border-t border-gray-200">
             <div className="flex gap-3">
-              <Link to={`/learn/topic/${topic.id}`}>
-                <Button
-                  variant="outline"
-                  className="border-stronger-blue text-stronger-blue hover:bg-stronger-blue/10"
-                >
-                  Continue Learning
-                </Button>
+              <Link
+                to={`/learn/${selectedSubtopic.id}`}
+                className="border-stronger-blue text-stronger-blue hover:bg-stronger-blue/10"
+              >
+                Continue Learning
               </Link>
-              <Link to={`/battle/topic/${topic.id}`}>
-                <Button className="bg-stronger-blue hover:bg-more-stronger-blue text-white">
-                  Start Battle <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
+
+              <Button
+                className="bg-stronger-blue hover:bg-more-stronger-blue text-white"
+                onClick={HandleMatchmaking}
+                disabled={status === 'searching'}
+              >
+                {status === 'searching' ? (
+                  <>
+                    Matching...
+                    <span className="ml-2 animate-spin">🔄</span>
+                  </>
+                ) : (
+                  <>
+                    Start Battle <ArrowRight className="ml-2 w-4 h-4" />
+                  </>
+                )}
+              </Button>
             </div>
           </DialogFooter>
         </div>

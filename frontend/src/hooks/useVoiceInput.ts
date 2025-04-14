@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface VoiceInputOptions {
   onResult: (transcript: string) => void;
@@ -11,13 +13,14 @@ export function useVoiceInput({ onResult, onSilentTimeout, onError, silentTimeou
   const [listening, setListening] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const silentTimerRef = useRef<NodeJS.Timeout | null>(null);
-
+  const navigator = useNavigate();
   useEffect(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
   
     if (!SpeechRecognition) {
-      console.warn('Speech Recognition not supported in this browser.');
+      
+      navigator("/battle-map")
       return;
     }
   

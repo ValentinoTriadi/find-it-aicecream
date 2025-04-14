@@ -27,6 +27,7 @@ const staticTopicMap: Record<string, string> = {
 
 export default function BattleGame() {
   const { topicId } = useParams<{ topicId: string }>();
+  const {subtopicId} = useParams<{ subtopicId: string }>();
   const topicName = staticTopicMap[topicId ?? ''] ?? 'Unknown Topic';
 
   const [scriptHintVisible, setScriptHintVisible] = useState(false);
@@ -50,7 +51,7 @@ export default function BattleGame() {
     advanceRound,
     checkGameOver,
     progress,
-  } = useRoundManager(TOTAL_ROUNDS, MUTE_LIMIT);
+  } = useRoundManager(TOTAL_ROUNDS, MUTE_LIMIT, topicId ?? '', 1);
 
   useScriptHintManager({
     currentPlayer,
@@ -81,9 +82,9 @@ export default function BattleGame() {
     onSilentTimeout: () => {
       setScriptHintVisible(true);
       if (currentPlayer === 'player') {
-        setPlayerMuteCount((prev) => prev + 1);
+        setPlayerMuteCount(playerMuteCount + 1);
       } else {
-        setEnemyMuteCount((prev) => prev + 1);
+        setEnemyMuteCount(enemyMuteCount + 1);
       }
       endCurrentRound();
     },
@@ -133,7 +134,7 @@ export default function BattleGame() {
 
   useEffect(() => {
     const socket = new WebSocket(
-      import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/1',
+      import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/1/1',
     ); // 1 for room_id 1 (static)
     socketRef.current = socket;
 
