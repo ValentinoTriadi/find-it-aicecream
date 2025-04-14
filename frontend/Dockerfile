@@ -16,6 +16,6 @@ COPY . .
 
 RUN pnpm run build
 
-EXPOSE 3000
+EXPOSE 3131
 
 CMD [ "serve", "-s", "dist" ]

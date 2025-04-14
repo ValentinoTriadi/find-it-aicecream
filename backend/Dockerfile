@@ -14,7 +14,8 @@ RUN apt update && apt install -y ffmpeg
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose port WebSocket
-EXPOSE 8000
+EXPOSE 8181
 
 # Jalankan server WebSocket
-CMD ["python", "server.py"]
+RUN cd app
+CMD ["python", '-m', "main"]

@@ -1,6 +1,7 @@
 'use client';
 
 import { signInWithEmail } from '@/api/auth';
+import { useAuth } from '@/context/auth.context';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Cookies from 'js-cookie';
 import { Eye, EyeOffIcon } from 'lucide-react';
@@ -19,7 +20,6 @@ import {
   FormMessage,
 } from '../ui/form';
 import { Input } from '../ui/input';
-import { useAuth } from '@/context/auth.context';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),

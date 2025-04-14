@@ -12,8 +12,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "typeRoots": ["./src/@types", "./node_modules/@types"],
     "baseUrl": ".",
@@ -33,8 +33,7 @@
       "@services/*": ["src/services/*"]
     },
     "types": ["node"]
-
   },
   "include": ["src", "tailwind.config.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

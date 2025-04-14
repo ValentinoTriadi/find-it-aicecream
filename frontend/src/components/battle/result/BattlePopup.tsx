@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { ArrowRight, Repeat, Trophy } from 'lucide-react';
@@ -6,7 +7,6 @@ import { useEffect, useState } from 'react';
 import AchievementTab from './AchievementTab';
 import FeedbackTab from './FeedbackTab';
 import StatsTab from './StatsTab';
-import { Button } from '@/components/ui/button';
 
 const tabs = ['Achievement', 'Stats', 'Feedback'];
 
@@ -141,15 +141,15 @@ export default function BattlePopup({
             <Button
               onClick={onRetry}
               className="px-4 py-2 border border-stronger-blue text-stronger-blue rounded-sm bg-white"
-              variant={"outline"}
+              variant={'outline'}
             >
-              <Repeat/> Try Again
+              <Repeat /> Try Again
             </Button>
             <Button
               onClick={onContinue}
               className="px-4 py-4 rounded-sm bg-bolder-blue text-white bg-stronger-blue"
             >
-              Continue <ArrowRight/>
+              Continue <ArrowRight />
             </Button>
           </div>
         </CardContent>

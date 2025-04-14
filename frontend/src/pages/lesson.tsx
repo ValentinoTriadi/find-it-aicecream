@@ -3,7 +3,7 @@ import { Quiz } from '@/components/learn/lesson/Quiz';
 import { VideoPlayer } from '@/components/learn/lesson/VideoPlayer';
 import { Button } from '@mui/material';
 import { ArrowLeft } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 // Dummy data

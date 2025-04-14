@@ -67,8 +67,6 @@ const userChallengeProgress = [
   // ... other challenges
 ];
 
-
-
 export default function LearnPage() {
   const [learnUnits, setLearnUnits] = useState(sampleUnits);
 

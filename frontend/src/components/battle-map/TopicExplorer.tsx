@@ -14,7 +14,6 @@ interface TopicProps {
   handleSelectTopic: (categoryId: string) => void;
 }
 
-
 export const TopicExplorer = ({
   availableTopics,
   selectedTopic,

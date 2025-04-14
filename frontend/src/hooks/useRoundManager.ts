@@ -28,7 +28,8 @@ export function useRoundManager(
     const token = localStorage.getItem("match_token") || crypto.randomUUID();
     localStorage.setItem("match_token", token);
 
-    const wsUrl = `ws://localhost:8000/ws?topic_id=${topicId}&subtopic_id=${subtopicId}&token=${token}`;
+
+    const wsUrl = `${import.meta.env.VITE_WEB_SOCKET_URL}/ws?topic_id=${topicId}&subtopic_id=${subtopicId}&token=${token}`;
     const socket = new WebSocket(wsUrl);
 
     socketRef.current = socket;

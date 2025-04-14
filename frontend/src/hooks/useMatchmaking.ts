@@ -19,7 +19,10 @@ export function useMatchmaking(topicId: string, subtopicId: string) {
     const token = sessionStorage.getItem('match_token') || crypto.randomUUID();
     sessionStorage.setItem('match_token', token);
 
-    const wsUrl = `ws://localhost:8000/ws/matchmake?topic_id=${topicId}&subtopic_id=${subtopicId}&token=${token}`;
+    const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/matchmake?topic_id=${topicId}&subtopic_id=${subtopicId}&token=${token}`;
+    // const wsUrl =
+    //   import.meta.env.VITE_WS_URL +
+    //   `/ws?topic_id=${topicId}&subtopic_id=${subTopicId}`;
     const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
 

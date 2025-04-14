@@ -11,7 +11,7 @@ interface SubtopicMapProps {
 
 export const SubtopicMap = ({ selectedTopic }: SubtopicMapProps) => {
   const [openedSubtopic, setOpenedSubtopic] = useState<SubTopic | null>(null);
-  
+
   function handleOpenSubtopic(id: number) {
     setOpenedSubtopic(
       selectedTopic.subtopic.find((sb) => sb.id === id) ?? null,
@@ -21,8 +21,6 @@ export const SubtopicMap = ({ selectedTopic }: SubtopicMapProps) => {
   function handleCloseSubtopic() {
     setOpenedSubtopic(null);
   }
-
-  
 
   return (
     <>
@@ -71,7 +69,6 @@ export const SubtopicMap = ({ selectedTopic }: SubtopicMapProps) => {
           onClose={handleCloseSubtopic}
           topic={selectedTopic}
           selectedSubtopic={openedSubtopic}
-          
         />
       )}
     </>

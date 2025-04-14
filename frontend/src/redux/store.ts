@@ -1,8 +1,8 @@
 import {
   type Action,
-  configureStore,
   type ThunkAction,
-} from "@reduxjs/toolkit";
+  configureStore,
+} from '@reduxjs/toolkit';
 
 export const store = configureStore({
   reducer: {},
