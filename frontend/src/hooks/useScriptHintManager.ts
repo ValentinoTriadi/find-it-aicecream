@@ -1,32 +1,18 @@
 import { useEffect } from 'react';
-import axios from 'axios';
 
 export function useScriptHintManager({
   currentPlayer,
   delay,
   onTrigger,
-  conversation,
 }: {
   currentPlayer: 'player' | 'enemy';
   delay: number;
-  onTrigger: (hint: string) => void;
-  conversation: any[];
+  onTrigger: () => void;
 }) {
   useEffect(() => {
-    const timeout = setTimeout(async () => {
-      try {
-        const res = await axios.post('/api/ai/script', {
-          user: currentPlayer === 'player' ? 'user1' : 'user2',
-          conversation,
-        });
-
-        const hint = res.data.script || 'Try saying something.';
-        onTrigger(hint);
-      } catch {
-        onTrigger('Try asking something engaging.');
-      }
+    const timer = setTimeout(() => {
+      if (currentPlayer === 'player') onTrigger();
     }, delay);
-
-    return () => clearTimeout(timeout);
-  }, [conversation, currentPlayer]);
+    return () => clearTimeout(timer);
+  }, [currentPlayer, onTrigger, delay]);
 }

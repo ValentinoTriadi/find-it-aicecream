@@ -11,86 +11,85 @@ import { Button } from '@/components/ui/button';
 const tabs = ['Achievement', 'Stats', 'Feedback'];
 
 interface BattlePopupProps {
+  round: number;
   topicName: string;
-  conversation: any[];
-  score: {
-    user1: number | string;
-    user2: number | string;
-  };
-  feedback: {
-    user1: string;
-    user2: string;
-  };
-  objectives: {
-    user1: Record<string, boolean>;
-    user2: Record<string, boolean>;
-  };
   onContinue: () => void;
   onRetry: () => void;
 }
 
-export interface FeedbackItem {
+interface Stats {
+  speaking: number;
+  vocabulary: number;
+  grammar: number;
+  listening: number;
+}
+
+interface Feedback {
   input: string;
   comment: string;
 }
 
-export interface Achievement {
+interface Achievement {
   title: string;
   description: string;
   completed: boolean;
 }
 
 export default function BattlePopup({
+  round,
   topicName,
-  conversation,
-  score,
-  feedback,
-  objectives,
   onContinue,
   onRetry,
 }: BattlePopupProps) {
   const [activeTab, setActiveTab] = useState('Achievement');
-  const [stats, setStats] = useState({
-    speaking: 0,
-    vocabulary: 0,
-    grammar: 0,
-    listening: 0,
-  });
-  const [formattedFeedback, setFormattedFeedback] = useState<FeedbackItem[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [exp, setExp] = useState(0);
 
   useEffect(() => {
-    const myIndex = parseInt(sessionStorage.getItem('battle_my_index') || '0');
-    const myKey = myIndex === 0 ? 'user1' : 'user2';
+    // 🔁 Replace with actual API logic if needed
+    const mockStats: Stats = {
+      speaking: 72,
+      vocabulary: 80,
+      grammar: 60,
+      listening: 70,
+    };
 
-    // Set basic scoring (fill in dummy values for now if only one score is provided)
-    setStats({
-      speaking: Number(score[myKey]) || 60,
-      vocabulary: 70,
-      grammar: 65,
-      listening: 75,
-    });
-
-    // Set feedback
-    setFormattedFeedback([
+    const mockFeedback: Feedback[] = [
       {
-        input: 'Overall Performance',
-        comment: feedback[myKey],
+        input:
+          'Excuse me, I just ordered but I want to check other menu as well.',
+        comment:
+          "Good job with your vocabulary usage! You correctly used 'menu', 'order', and 'check' in context.",
       },
-    ]);
+      {
+        input: 'Can I get another one?',
+        comment:
+          'You correctly asked for a replacement. Nice use of polite request.',
+      },
+    ];
 
-    // Set achievements based on completed objectives
-    const achieved = objectives[myKey];
-    const achievedList: Achievement[] = Object.entries(achieved).map(([title, completed]) => ({
-      title,
-      description: `Complete objective: ${title}`,
-      completed,
-    }));
+    const mockAchievements: Achievement[] = [
+      {
+        title: 'First Victory',
+        description: 'Win your first battle',
+        completed: true,
+      },
+      {
+        title: 'Quick Thinker',
+        description: 'Respond within 5 seconds',
+        completed: false,
+      },
+    ];
 
-    setAchievements(achievedList);
-    setExp(achievedList.filter((a) => a.completed).length * 100);
-  }, [score, feedback, objectives]);
+    setStats(mockStats);
+    setFeedback(mockFeedback);
+    setAchievements(mockAchievements);
+    setExp(505);
+  }, []);
+
+  if (!stats) return null; // or a loader
 
   const average =
     (stats.speaking + stats.vocabulary + stats.grammar + stats.listening) / 4;
@@ -134,7 +133,7 @@ export default function BattlePopup({
               <AchievementTab achievements={achievements} />
             )}
             {activeTab === 'Stats' && <StatsTab stats={stats} />}
-            {activeTab === 'Feedback' && <FeedbackTab feedback={formattedFeedback} />}
+            {activeTab === 'Feedback' && <FeedbackTab feedback={feedback} />}
           </div>
 
           {/* Actions */}
@@ -142,15 +141,15 @@ export default function BattlePopup({
             <Button
               onClick={onRetry}
               className="px-4 py-2 border border-stronger-blue text-stronger-blue rounded-sm bg-white"
-              variant="outline"
+              variant={"outline"}
             >
-              <Repeat /> Try Again
+              <Repeat/> Try Again
             </Button>
             <Button
               onClick={onContinue}
               className="px-4 py-4 rounded-sm bg-bolder-blue text-white bg-stronger-blue"
             >
-              Continue <ArrowRight />
+              Continue <ArrowRight/>
             </Button>
           </div>
         </CardContent>

@@ -1,6 +1,6 @@
 # from fastapi import FastAPI
 # from fastapi.middleware.cors import CORSMiddleware
-# import uvicorn
+
 # from routers import api_routes, websocket_routes
 
 # app = FastAPI()
@@ -20,9 +20,7 @@
 # def root() -> dict[str, str]:
 #     return {"message": "Welcome to the FastAPI project!"}
 
-# if __name__ == "__main__":
-#     uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)
-
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import matchmaking_routes, battle_routes
@@ -43,3 +41,6 @@ app.include_router(battle_routes.router)
 @app.get("/")
 def root():
     return {"message": "WebSocket Multiplayer Server Ready"}
+
+if __name__ == "__main__":
+    uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)

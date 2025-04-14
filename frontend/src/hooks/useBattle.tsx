@@ -1,23 +1,18 @@
-import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
-
 import { useVoiceInput } from './useVoiceInput';
 
 interface UseBattleOptions {
-  topic: string;
-
+  
+  totalRounds: number;
   muteLimit: number;
   roomId: string;
-  objectives: {
-    user1: string[];
-    user2: string[];
-  };
 }
 
 export function useBattle({
+  
+  totalRounds,
   muteLimit,
   roomId,
-  objectives,
 }: UseBattleOptions) {
   const ROUND_DURATION = 60000;
   const token = sessionStorage.getItem('match_token') || crypto.randomUUID();
@@ -31,11 +26,6 @@ export function useBattle({
     return stored !== null ? parseInt(stored) : -1;
   });
 
-  const [completedObjectives, setCompletedObjectives] = useState<{
-    user1: string[];
-    user2: string[];
-  }>({ user1: [], user2: [] });
-
   const [playerMuteCount, setPlayerMuteCount] = useState(0);
   const [enemyMuteCount, setEnemyMuteCount] = useState(0);
   const [startTimestamp, setStartTimestamp] = useState(Date.now());
@@ -45,23 +35,31 @@ export function useBattle({
   const [micError, setMicError] = useState('');
   const [micStarted, setMicStarted] = useState(false);
 
-  const isMyTurn = () => round % 2 === myIndex;
+  const isMyTurn = () => {
+    const turn = round % 2 === myIndex;
+    
+    return turn;
+  };
 
   const { startListening, stopListening, listening } = useVoiceInput({
     onResult: (text) => {
+      console.log(`[VOICE RESULT] Received: ${text}`);
       setMicError('');
       setMicStarted(false);
       setTranscript(text);
       setPlayerMuteCount(0);
     },
     onError: () => {
+      console.log(`[VOICE ERROR] Mic error occurred`);
       setMicError('❌ Your voice could not be recognized. Please try again.');
       setMicStarted(false);
       setTranscript('');
       stopListening();
     },
     onSilentTimeout: () => {
+      console.log(`[VOICE TIMEOUT] Silent timeout triggered`);
       if (isMyTurn()) {
+        console.log(`[TIMEOUT] Player missed turn. Advancing round.`);
         setPlayerMuteCount((count) => count + 1);
         advanceRound();
       } else {
@@ -70,34 +68,48 @@ export function useBattle({
     },
   });
 
-  const completeObjective = (user: 'user1' | 'user2', objective: string) => {
-    setCompletedObjectives((prev) => ({
-      ...prev,
-      [user]: [...new Set([...prev[user], objective])],
-    }));
-  };
-
   useEffect(() => {
     const wsUrl = `ws://localhost:8000/ws/battle?room_id=${roomId}&token=${token}`;
     const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
 
+    console.log(`[SOCKET INIT] Connecting to: ${wsUrl}`);
+
+    socket.onopen = () => {
+      console.log('✅ WebSocket connected');
+    };
+
     socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+        console.log('[WS RECEIVED]', data);
+
         if (data.event === 'sync-state') {
           const state = data.data;
+          console.log(`[SYNC STATE]`, state);
           setRound(state.round);
           setPlayerMuteCount(state.playerMuteCount);
           setEnemyMuteCount(state.enemyMuteCount);
           setStartTimestamp(state.startTimestamp);
         } else if (data.event === 'message') {
+          console.log('[NEW MESSAGE]', data.data);
           setConversation((prev) => [...prev, data.data]);
         }
       } catch (err) {
         console.error('❌ Failed to parse WebSocket message:', err);
       }
     };
+
+    socket.onerror = (e) => {
+      console.error('❌ WebSocket error:', e);
+    };
+
+    socket.onclose = () => {
+        console.log('🔌 WebSocket disconnected, clearing session data');
+        sessionStorage.removeItem('match_token');
+        sessionStorage.removeItem('battle_my_index');
+      };
+      
 
     return () => {
       socket.close();
@@ -106,13 +118,11 @@ export function useBattle({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const timeLeft = Math.max(
-        ROUND_DURATION - (Date.now() - startTimestamp),
-        0,
-      );
+      const timeLeft = Math.max(ROUND_DURATION - (Date.now() - startTimestamp), 0);
       setProgress(timeLeft / ROUND_DURATION);
 
       if (timeLeft <= 0 && isMyTurn()) {
+        console.log('[TIMER] Round expired. Auto advancing...');
         advanceRound();
       }
     }, 100);
@@ -122,6 +132,7 @@ export function useBattle({
 
   const advanceRound = () => {
     const socket = socketRef.current;
+    console.log(`[ADVANCE ROUND] From round ${round} → ${round + 1}`);
     if (socket?.readyState === WebSocket.OPEN) {
       socket.send(
         JSON.stringify({
@@ -130,7 +141,7 @@ export function useBattle({
             round: round + 1,
             startTimestamp: Date.now(),
           },
-        }),
+        })
       );
     }
     setTranscript('');
@@ -139,79 +150,39 @@ export function useBattle({
   };
 
   const handleMicClick = () => {
+    console.log(`[MIC CLICKED]`);
     setMicError('');
     setTranscript('');
     setMicStarted(true);
     startListening();
   };
 
-  const handleSubmit = async () => {
-    if (!isMyTurn()) return;
+  const handleSubmit = () => {
+    if (!isMyTurn()) {
+      console.warn(`[SUBMIT BLOCKED] Not your turn.`);
+      return;
+    }
 
     const socket = socketRef.current;
-    const messagePayload = {
-      event: 'message',
-      data: {
-        type: 'playerTurn',
-        round,
-        player: myIndex,
-        transcript,
-      },
-    };
-
-    socket?.send(JSON.stringify(messagePayload));
-
-    // ✅ AI Objective Checking (POST /api/ai/objectives)
-    try {
-      const conversationText = [
-        ...conversation,
-        { player: myIndex, transcript },
-      ]
-        .map(
-          (msg) =>
-            `${msg.player === myIndex ? 'user1' : 'user2'}: ${msg.transcript}`,
-        )
-        .join('\n');
-
-      const response = await axios.post('/api/ai/objectives', {
-        topic: 'Current Topic',
-        conversation: conversationText,
-        role: {
-          user1: 'player',
-          user2: 'enemy',
+    socket?.send(
+      JSON.stringify({
+        event: 'message',
+        data: {
+          type: 'playerTurn',
+          round,
+          player: myIndex,
+          transcript,
         },
-        objective: objectives,
-      });
-
-      const result = response.data.objectives;
-      for (const user in result) {
-        for (const objective in result[user]) {
-          if (result[user][objective]) {
-            completeObjective(user as 'user1' | 'user2', objective);
-          }
-        }
-      }
-    } catch (e) {
-      console.error('❌ Objective evaluation failed:', e);
-    }
+      })
+    );
 
     advanceRound();
   };
 
-  const checkGameOver = () => {
-    const allCompleted = Object.entries(objectives).every(
-      ([user, required]) => {
-        const done = completedObjectives[user as 'user1' | 'user2'] || [];
-        return required.every((obj) => done.includes(obj));
-      },
-    );
-
-    return (
-      allCompleted ||
-      playerMuteCount >= muteLimit ||
-      enemyMuteCount >= muteLimit
-    );
-  };
+  const checkGameOver = () =>
+    round > totalRounds ||
+    playerMuteCount >= muteLimit ||
+    enemyMuteCount >= muteLimit;
 
   return {
     round,
@@ -229,7 +200,6 @@ export function useBattle({
     handleMicClick,
     handleSubmit,
     checkGameOver,
-    completeObjective,
     setPlayerMuteCount: (count: number) => setPlayerMuteCount(count),
     setEnemyMuteCount: (count: number) => setEnemyMuteCount(count),
   };
