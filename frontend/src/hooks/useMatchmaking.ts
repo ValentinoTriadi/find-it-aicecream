@@ -1,27 +1,32 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type MatchmakingState = 'idle' | 'searching' | 'matched';
 
 interface MatchFoundPayload {
   roomId: string;
+  myIndex: number;
 }
 
-export function useMatchmaking(topicId: string, subTopicId: string) {
+export function useMatchmaking(topicId: string, subtopicId: string) {
   const [status, setStatus] = useState<MatchmakingState>('idle');
   const [roomId, setRoomId] = useState<string | null>(null);
+  const [myIndex, setMyIndex] = useState<number | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
 
   const startMatchmaking = () => {
-    console.log('Starting matchmaking...');
+    console.log('🎮 Starting matchmaking...');
 
-    const wsUrl = `ws://localhost:8000/ws?topic_id=${topicId}&subtopic_id=${subTopicId}`;
+    const token = sessionStorage.getItem('match_token') || crypto.randomUUID();
+    sessionStorage.setItem('match_token', token);
+
+    const wsUrl = `ws://localhost:8000/ws/matchmake?topic_id=${topicId}&subtopic_id=${subtopicId}&token=${token}`;
     const socket = new WebSocket(wsUrl);
-
     socketRef.current = socket;
+
     setStatus('searching');
 
     socket.onopen = () => {
-      console.log('✅ WebSocket connected');
+      console.log('✅ WebSocket connected to matchmaking');
     };
 
     socket.onmessage = (event) => {
@@ -30,11 +35,17 @@ export function useMatchmaking(topicId: string, subTopicId: string) {
         if (data.event === 'match-found') {
           const payload = data.data as MatchFoundPayload;
           console.log('🎯 Match found:', payload.roomId);
+
+          // 🧠 Save to state
           setRoomId(payload.roomId);
+          setMyIndex(payload.myIndex);
           setStatus('matched');
+
+          // 💾 Save to sessionStorage
+          sessionStorage.setItem('battle_my_index', String(payload.myIndex));
         }
       } catch (err) {
-        console.error('Failed to parse WebSocket message:', err);
+        console.error('❌ Failed to parse WebSocket message:', err);
       }
     };
 
@@ -49,9 +60,18 @@ export function useMatchmaking(topicId: string, subTopicId: string) {
     };
   };
 
+  useEffect(() => {
+    return () => {
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        socketRef.current.close();
+      }
+    };
+  }, []);
+
   return {
     status,
     roomId,
+    myIndex,
     socket: socketRef.current,
     startMatchmaking,
   };

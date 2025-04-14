@@ -1,3 +1,5 @@
+'use client';
+
 import EnemyTimerBar from '@/components/battle/EnemyTimeBar';
 import MicController from '@/components/battle/MicController';
 import PausePopup from '@/components/battle/PausePopup';
@@ -5,16 +7,16 @@ import ScriptHint from '@/components/battle/ScriptHint';
 import TimerCircle from '@/components/battle/TimerCircle';
 import BattlePopup from '@/components/battle/result/BattlePopup';
 import { Card } from '@/components/ui/card';
-import { useRoundManager } from '@/hooks/useRoundManager';
+import { useBattle } from '@/hooks/useBattle';
 import { useScriptHintManager } from '@/hooks/useScriptHintManager';
-import { useVoiceInput } from '@/hooks/useVoiceInput';
 import { cn } from '@/lib/utils';
+import { objectivesMap, rolesMap } from '@/utils/objectives';
 import Button from '@mui/material/Button';
+import axios from 'axios';
 import { Info, Pause } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-const TOTAL_ROUNDS = 1;
 const SCRIPT_HINT_DELAY = 7000;
 const MUTE_LIMIT = 4;
 
@@ -26,175 +28,124 @@ const staticTopicMap: Record<string, string> = {
 };
 
 export default function BattleGame() {
-  const { topicId } = useParams<{ topicId: string }>();
-  const {subtopicId} = useParams<{ subtopicId: string }>();
-  const topicName = staticTopicMap[topicId ?? ''] ?? 'Unknown Topic';
+  const { topicId, subtopicId, roomId } = useParams<{
+    roomId: string;
+    topicId: string;
+    subtopicId: string;
+  }>();
 
-  const [scriptHintVisible, setScriptHintVisible] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [playerTranscript, setPlayerTranscript] = useState('');
-  const [micStarted, setMicStarted] = useState(false);
-  const [micError, setMicError] = useState('');
+  const topicName = staticTopicMap[subtopicId ?? '1'] ?? 'Unknown Topic';
+  const currentObjectives = normalizeObjectives(objectivesMap[subtopicId ?? '1'] ?? [])
+  const currentRoles = rolesMap[subtopicId ?? '1'] ?? { user1: 'waiter', user2: 'customer' };
+
+  const [scriptHintVisible, setScriptHintVisible] = useState<string | null>(null);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   const [showPausePopup, setShowPausePopup] = useState(false);
-  const [conversation, setConversation] = useState<any[]>([]);
 
-  const socketRef = useRef<WebSocket | null>(null);
+  const [score, setScore] = useState<any | null>(null);
+  const [feedback, setFeedback] = useState<any | null>(null);
+  const [objectives, setObjectives] = useState<any | null>(null);
+
+
+  function normalizeObjectives(
+    raw: string[] | { user1: string[]; user2: string[] }
+  ): { user1: string[]; user2: string[] } {
+    if ('user1' in raw && 'user2' in raw) {
+      return raw;
+    }
+  
+    return {
+      user1: raw,
+      user2: raw,
+    };
+  }
+
+
+
 
   const {
     round,
-    currentPlayer,
-    playerMuteCount,
-    enemyMuteCount,
-    setPlayerMuteCount,
-    setEnemyMuteCount,
-    advanceRound,
-    checkGameOver,
+    isMyTurn,
     progress,
-  } = useRoundManager(TOTAL_ROUNDS, MUTE_LIMIT, topicId ?? '', 1);
+    micStarted,
+    micError,
+    listening,
+    transcript,
+    setMicStarted,
+    handleMicClick,
+    handleSubmit,
+    checkGameOver,
+    conversation,
+    myIndex,
+    completeObjective,
+  } = useBattle({
+    topic: topicName, 
+    muteLimit: MUTE_LIMIT,
+    roomId: roomId ?? crypto.randomUUID(),
+    objectives: currentObjectives,
+  });
+  
 
   useScriptHintManager({
-    currentPlayer,
+    currentPlayer: isMyTurn() ? 'player' : 'enemy',
     delay: SCRIPT_HINT_DELAY,
-    onTrigger: () => {
-      if (currentPlayer === 'player') {
-        setScriptHintVisible(true);
-      }
+    conversation,
+    onTrigger: (hint: string) => {
+      if (isMyTurn()) setScriptHintVisible(hint);
     },
   });
 
-  const { startListening, stopListening, listening } = useVoiceInput({
-    onResult: (text) => {
-      setScriptHintVisible(false);
-
-      setMicStarted(false);
-      setMicError('');
-      setPlayerMuteCount(0);
-      setPlayerTranscript(text);
-    },
-
-    onError: () => {
-      setMicError('❌ Your voice could not be recognized. Please try again.');
-      setMicStarted(false);
-      setPlayerTranscript('');
-      stopListening();
-    },
-    onSilentTimeout: () => {
-      setScriptHintVisible(true);
-      if (currentPlayer === 'player') {
-        setPlayerMuteCount(playerMuteCount + 1);
-      } else {
-        setEnemyMuteCount(enemyMuteCount + 1);
-      }
-      endCurrentRound();
-    },
-  });
+  
 
   useEffect(() => {
-    if (checkGameOver()) {
-      setShowFinalPopup(true);
-    }
-  }, [round]);
+    if (!checkGameOver()) return;
 
-  const endCurrentRound = () => {
-    const text = playerTranscript;
-    sendMessage({
-      type: 'playerTurn',
-      data: {
-        round,
-        player: currentPlayer,
-        transcript: text,
-      },
-    });
-
-    advanceRound();
-    setPlayerTranscript('');
-    setMicStarted(false);
-    stopListening();
-  };
-
-  const handleMicClick = () => {
-    setScriptHintVisible(false);
-
-    if (!micStarted) {
-      setMicStarted(true);
-      setPlayerTranscript('');
-      startListening();
-    } else {
-      // Retry: stop current, reset, and restart mic
-      stopListening();
-      setPlayerTranscript('');
-      startListening();
-    }
-  };
-
-  const handleSubmit = () => {
-    endCurrentRound();
-  };
-
-  useEffect(() => {
-    const socket = new WebSocket(
-      import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/1/1',
-    ); // 1 for room_id 1 (static)
-    socketRef.current = socket;
-
-    socket.onopen = () => {
-      console.log('WebSocket connection established');
-    };
-
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      console.log('Received message:', message);
-
-      // Handle incoming messages
-      setConversation((prev) => {
-        const updatedConversation = [...prev, message];
-        console.log('Updated conversation:', updatedConversation); // Logs the correct updated state
-        return updatedConversation;
-      });
-    };
-
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    socket.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
-
-    return () => {
-      socket.close();
-    };
-  }, []);
-
-  const sendMessage = (data: any) => {
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      console.log('Sending message:', data);
+    const fetchResults = async () => {
+      const conversationText = conversation
+        .map((msg) => `${msg.player === myIndex ? 'user1' : 'user2'}: ${msg.transcript}`)
+        .join('\n');
 
       try {
-        socketRef.current.send(JSON.stringify(data));
-      } catch (error) {
-        console.error('Error sending message:', error);
+        const [feedbackRes, scoreRes, objRes] = await Promise.all([
+          axios.post('/api/ai/feedback', { conversation: conversationText }),
+          axios.post('/api/ai/score', { conversation: conversationText }),
+          axios.post('/api/ai/objectives', {
+            topic: topicName,
+            conversation: conversationText,
+            role: currentRoles,
+            objective: currentObjectives,
+          }),
+        ]);
+
+        setFeedback(feedbackRes.data.feedback);
+        setScore(scoreRes.data.score);
+        setObjectives(objRes.data.objectives);
+        setShowFinalPopup(true);
+      } catch (err) {
+        console.error('❌ Failed to fetch results from AI:', err);
       }
-    } else {
-      console.error('WebSocket is not open');
-    }
-  };
+    };
+
+    fetchResults();
+  }, [checkGameOver()]);
+  
+  const myKey = (myIndex === 0 ? 'user1' : 'user2') as 'user1' | 'user2';
+  const allObjectives = currentObjectives[myKey] ?? [];
+  const currentObjectiveIndex = round - 1;
+  const currentObjective = allObjectives[currentObjectiveIndex] || '🎉 All objectives completed';
+
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center p-6 gap-20">
       {/* Top Bar */}
       <div className="flex flex-row w-full justify-around gap-5">
-        <Button type="button" className="w-fit h-fit text-black">
-          <Pause
-            className="w-12 h-12 text-black"
-            onClick={() => setShowPausePopup(true)}
-          />
+        <Button onClick={() => setShowPausePopup(true)} className="w-fit h-fit text-black">
+          <Pause className="w-12 h-12 text-black" />
         </Button>
 
         <Card className="w-2xl px-6 text-center max-w-3xl min-w-md bg-white text-dark-blue drop-shadow-md">
           <h1 className="text-2xl font-medium">Round {round}</h1>
-          <p className="font-semibold text-3xl">{topicName}</p>
+          <p className="font-semibold text-xl text-primary-blue">🎯 {currentObjective}</p>
         </Card>
 
         <Button className="w-fit h-fit text-black">
@@ -202,23 +153,18 @@ export default function BattleGame() {
         </Button>
       </div>
 
-      {/* Main Battle Section */}
+      {/* Main Section */}
       <div className="flex flex-row w-full gap-5 items-center justify-around">
-        {/* Player Side */}
         <div className="flex flex-col items-center gap-4">
-          {scriptHintVisible && currentPlayer === 'player' && (
-            <ScriptHint message="Can I ask for another menu? I want to change some of the food I ordered." />
+          {scriptHintVisible && isMyTurn() && (
+            <ScriptHint message={scriptHintVisible} />
           )}
-          <img
-            className="min-w-xs max-w-sm"
-            src="/images/player-1-avatar.png"
-          />
+          <img className="min-w-xs max-w-sm" src="/images/player-1-avatar.png" />
         </div>
 
-        {/* Center Timer + Controls */}
         <div className="flex flex-col items-center justify-between gap-6">
-          <TimerCircle progress={progress} />
-          {currentPlayer === 'player' && (
+          {isMyTurn() && <TimerCircle progress={progress} />}
+          {isMyTurn() && (
             <div className="flex flex-col items-center gap-4">
               {!micStarted && (
                 <div className="flex flex-col items-center gap-2">
@@ -227,17 +173,13 @@ export default function BattleGame() {
                       {micError}
                     </div>
                   )}
-                  <MicController
-                    listening={listening}
-                    onClick={handleMicClick}
-                  />
+                  <MicController listening={listening} onClick={handleMicClick} />
                 </div>
               )}
-
-              {playerTranscript && (
+              {transcript && (
                 <>
                   <div className="bg-primary-blue text-dark-blue px-4 py-2 rounded text-sm shadow">
-                    You said: <em>{playerTranscript}</em>
+                    You said: <em>{transcript}</em>
                   </div>
                   <button
                     onClick={handleSubmit}
@@ -251,20 +193,12 @@ export default function BattleGame() {
           )}
         </div>
 
-        {/* Enemy Side */}
-        <div
-          className={cn(
-            'flex flex-col h-full justify-between pt-12',
-            currentPlayer === 'player' && 'opacity-60',
-          )}
-        >
-          <EnemyTimerBar progress={currentPlayer === 'enemy' ? progress : 0} />
-          <img
-            className="min-w-xs max-w-sm"
-            src="/images/player-2-avatar.png"
-          />
+        <div className={cn('flex flex-col h-full justify-between pt-12', isMyTurn() && 'opacity-60')}>
+          <EnemyTimerBar progress={!isMyTurn() ? progress : 0} />
+          <img className="min-w-xs max-w-sm" src="/images/player-2-avatar.png" />
         </div>
       </div>
+
       {showPausePopup && (
         <PausePopup
           topicName={topicName}
@@ -274,11 +208,14 @@ export default function BattleGame() {
         />
       )}
 
-      {showFinalPopup && (
+      {showFinalPopup && score && feedback && objectives && (
         <BattlePopup
-          round={round}
           topicName={topicName}
-          onContinue={() => window.location.href = '/battle-map'}
+          conversation={conversation}
+          score={score}
+          feedback={feedback}
+          objectives={objectives}
+          onContinue={() => (window.location.href = '/battle-map')}
           onRetry={() => window.location.reload()}
         />
       )}
