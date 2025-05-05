@@ -1,74 +1,54 @@
 // src/pages/learn/index.tsx
-import { Unit } from '@/components/learn/LearnUnit';
-import {
-  Award,
-  BarChart2,
-  BookOpen,
-  MessageSquare,
-  Swords,
-} from 'lucide-react';
-import { useState } from 'react';
-
-// Sample data structure matching your schema
-const sampleUnits = [
-  {
-    id: 1,
-    order: 1,
-    title: 'Basic Vocabulary',
-    description: 'Learn essential words and phrases',
-    lessons: [
-      {
-        id: 1,
-        title: 'Greetings',
-        challenges: [{ id: 1 }, { id: 2 }],
-        completed: false,
-      },
-      {
-        id: 2,
-        title: 'Numbers',
-        challenges: [{ id: 3 }, { id: 4 }],
-        completed: false,
-      },
-      {
-        id: 3,
-        title: 'Common Objects',
-        challenges: [{ id: 5 }, { id: 6 }],
-        completed: false,
-      },
-    ],
-  },
-  {
-    id: 2,
-    order: 2,
-    title: 'Grammar Fundamentals',
-    description: 'Understand basic sentence structures',
-    lessons: [
-      {
-        id: 4,
-        title: 'Present Tense',
-        challenges: [{ id: 7 }, { id: 8 }],
-        completed: false,
-      },
-      {
-        id: 5,
-        title: 'Pronouns',
-        challenges: [{ id: 9 }, { id: 10 }],
-        completed: false,
-      },
-    ],
-  },
-];
+import { Unit } from "@/components/learn/LearnUnit";
+import { useState } from "react";
+import { learnUnits as initialLearnUnits } from "@/utils/data-learn";
 
 // Sample user progress data
 const userChallengeProgress = [
-  { challengeId: 1, completed: true },
-  { challengeId: 2, completed: true },
+  { challengeId: 1, completed: false },
+  { challengeId: 2, completed: false },
   { challengeId: 3, completed: false },
-  // ... other challenges
+  { challengeId: 4, completed: false },
+  { challengeId: 5, completed: false },
+  { challengeId: 6, completed: false },
+  { challengeId: 7, completed: false },
+  { challengeId: 8, completed: false },
+  { challengeId: 9, completed: false },
+  { challengeId: 10, completed: false },
+  { challengeId: 11, completed: false },
+  { challengeId: 12, completed: false },
+  { challengeId: 13, completed: false },
+  { challengeId: 14, completed: false },
+  { challengeId: 15, completed: false },
+  { challengeId: 16, completed: false },
+  { challengeId: 17, completed: false },
+  { challengeId: 18, completed: false },
+  { challengeId: 19, completed: false },
+  { challengeId: 20, completed: false },
+  { challengeId: 21, completed: false },
+  { challengeId: 22, completed: false },
+  { challengeId: 23, completed: false },
+  { challengeId: 24, completed: false },
+  { challengeId: 25, completed: false },
+  { challengeId: 26, completed: false },
+  { challengeId: 27, completed: false },
+  { challengeId: 28, completed: false },
+  { challengeId: 29, completed: false },
+  { challengeId: 30, completed: false },
+  { challengeId: 31, completed: false },
+  { challengeId: 32, completed: false },
+  { challengeId: 33, completed: false },
+  { challengeId: 34, completed: false },
+  { challengeId: 35, completed: false },
+  { challengeId: 36, completed: false },
+  { challengeId: 37, completed: false },
+  { challengeId: 38, completed: false },
+  { challengeId: 39, completed: false },
+  { challengeId: 40, completed: false },
 ];
 
 export default function LearnPage() {
-  const [learnUnits, setLearnUnits] = useState(sampleUnits);
+  const [learnUnits, setLearnUnits] = useState(initialLearnUnits);
 
   return (
     <div className="flex-1 p-8 overflow-auto">

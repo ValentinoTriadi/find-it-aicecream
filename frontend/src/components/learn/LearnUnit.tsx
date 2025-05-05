@@ -1,11 +1,12 @@
 // src/pages/learn/unit.tsx
-import { LessonButton } from './LearnButton';
-import { UnitBanner } from './LearnUnitBanner';
+import { LessonButton } from "./LearnButton";
+import { UnitBanner } from "./LearnUnitBanner";
 
 type Lesson = {
   id: number;
   challenges: { id: number }[];
   completed?: boolean;
+  lessonType: "QUIZ" | "VIDEO";
 };
 
 type UnitProps = {
@@ -24,10 +25,11 @@ export const Unit = ({
   lessons,
   userChallengeProgress,
 }: UnitProps) => {
+  // Set of completed challenge IDs
   const completedChallengeIds = new Set(
     userChallengeProgress
       .filter((progress) => progress.completed)
-      .map((progress) => progress.challengeId),
+      .map((progress) => progress.challengeId)
   );
 
   return (
@@ -36,17 +38,29 @@ export const Unit = ({
 
       <div className="relative flex flex-col items-center">
         {lessons.map((lesson, i) => {
-          const isLessonCompleted = lesson.challenges.every((challenge) =>
-            completedChallengeIds.has(challenge.id),
-          );
+          const isFirst = i === 0;
 
+          // Lesson dianggap selesai jika semua challenge selesai (kecuali VIDEO)
+          const isLessonCompleted =
+            lesson.lessonType === "VIDEO"
+              ? false // Atur sesuai progress video jika ada
+              : lesson.challenges.length > 0 &&
+                lesson.challenges.every((challenge) =>
+                  completedChallengeIds.has(challenge.id)
+                );
+
+          // Lesson pertama: current jika belum selesai
+          // Lesson lain: current jika belum selesai dan lesson sebelumnya sudah selesai
           const isCurrent =
-            !isLessonCompleted &&
-            (i === 0 ||
+            (!isLessonCompleted && isFirst) ||
+            (!isLessonCompleted &&
+              !isFirst &&
+              lessons[i - 1].lessonType !== "VIDEO" &&
               lessons[i - 1].challenges.every((ch) =>
-                completedChallengeIds.has(ch.id),
+                completedChallengeIds.has(ch.id)
               ));
 
+          // Lesson yang belum selesai dan bukan current = locked
           const isLocked = !isLessonCompleted && !isCurrent;
 
           return (

@@ -1,16 +1,14 @@
-'use client';
+"use client";
 
-import { signInWithEmail } from '@/api/auth';
-import { useAuth } from '@/context/auth.context';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Cookies from 'js-cookie';
-import { Eye, EyeOffIcon } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { z } from 'zod';
+import { useAuth } from "@/context/auth.context";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOffIcon } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 
-import { Button } from '../ui/button';
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -18,36 +16,41 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../ui/form';
-import { Input } from '../ui/input';
+} from "../ui/form";
+import { Input } from "../ui/input";
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters long'),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
 export const LoginForm = () => {
   const [isPasswordShown, setPasswordShown] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const auth = useAuth();
   const navigate = useNavigate();
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
   async function onSubmit(data: z.infer<typeof loginSchema>) {
+    setErrorMessage(null); // Reset error sebelum submit
     try {
-      const res = await auth.login({
+      await auth.login({
         email: data.email,
         password: data.password,
       });
     } catch (error) {
-      console.error('Error signing in:', error);
-      return;
+      if (error instanceof Error && error.message) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Login failed. Please check your credentials.");
+      }
     }
   }
 
@@ -68,11 +71,10 @@ export const LoginForm = () => {
                   {...field}
                 />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
-        ></FormField>
+        />
         <FormField
           control={loginForm.control}
           name="password"
@@ -83,13 +85,13 @@ export const LoginForm = () => {
                 <div className="flex w-full relative">
                   <Input
                     id="password"
-                    type={isPasswordShown ? 'text' : 'password'}
+                    type={isPasswordShown ? "text" : "password"}
                     placeholder="Enter Your password"
                     {...field}
                   />
                   <Button
                     className="absolute right-0"
-                    variant={'ghost'}
+                    variant={"ghost"}
                     onClick={() => setPasswordShown(!isPasswordShown)}
                     type="button"
                   >
@@ -105,6 +107,9 @@ export const LoginForm = () => {
             </FormItem>
           )}
         />
+        {errorMessage && (
+          <div className="text-red-500 text-sm text-center">{errorMessage}</div>
+        )}
         <Button
           type="submit"
           className="w-full bg-stronger-blue hover:bg-more-stronger-blue text-white"

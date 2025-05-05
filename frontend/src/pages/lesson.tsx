@@ -1,53 +1,53 @@
 // src/pages/lesson/[id].tsx
-import { Quiz } from '@/components/learn/lesson/Quiz';
-import { VideoPlayer } from '@/components/learn/lesson/VideoPlayer';
-import { Button } from '@mui/material';
-import { ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-
-// Dummy data
-const dummyLessons = [
-  {
-    id: 1,
-    title: 'Basic Vocabulary',
-    lessonType: 'QUIZ',
-    challenges: [
-      {
-        id: 1,
-        question: "What does 'hello' mean?",
-        challengeOptions: [
-          { id: 1, challengeId: 1, text: 'Greeting', correct: true },
-          { id: 2, challengeId: 1, text: 'Farewell', correct: false },
-          { id: 3, challengeId: 1, text: 'Question', correct: false },
-          { id: 4, challengeId: 1, text: 'Answer', correct: false },
-        ],
-      },
-      {
-        id: 2,
-        question: "What does 'goodbye' mean?",
-        challengeOptions: [
-          { id: 5, challengeId: 2, text: 'Greeting', correct: false },
-          { id: 6, challengeId: 2, text: 'Farewell', correct: true },
-          { id: 7, challengeId: 2, text: 'Question', correct: false },
-          { id: 8, challengeId: 2, text: 'Answer', correct: false },
-        ],
-      },
-    ],
-    videoUrl: null,
-  },
-  {
-    id: 2,
-    title: 'Grammar Basics',
-    lessonType: 'VIDEO',
-    challenges: [],
-    videoUrl: 'dQw4w9WgXcQ', // Example YouTube video ID
-  },
-];
+import { Quiz } from "@/components/learn/lesson/Quiz";
+import { VideoPlayer } from "@/components/learn/lesson/VideoPlayer";
+import { Button } from "@mui/material";
+import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { lessons } from "@/utils/data-lesson";
 
 const dummyUserProgress = [
   { challengeId: 1, completed: false },
   { challengeId: 2, completed: false },
+  { challengeId: 3, completed: false },
+  { challengeId: 4, completed: false },
+  { challengeId: 5, completed: false },
+  { challengeId: 6, completed: false },
+  { challengeId: 7, completed: false },
+  { challengeId: 8, completed: false },
+  { challengeId: 9, completed: false },
+  { challengeId: 10, completed: false },
+  { challengeId: 11, completed: false },
+  { challengeId: 12, completed: false },
+  { challengeId: 13, completed: false },
+  { challengeId: 14, completed: false },
+  { challengeId: 15, completed: false },
+  { challengeId: 16, completed: false },
+  { challengeId: 17, completed: false },
+  { challengeId: 18, completed: false },
+  { challengeId: 19, completed: false },
+  { challengeId: 20, completed: false },
+  { challengeId: 21, completed: false },
+  { challengeId: 22, completed: false },
+  { challengeId: 23, completed: false },
+  { challengeId: 24, completed: false },
+  { challengeId: 25, completed: false },
+  { challengeId: 26, completed: false },
+  { challengeId: 27, completed: false },
+  { challengeId: 28, completed: false },
+  { challengeId: 29, completed: false },
+  { challengeId: 30, completed: false },
+  { challengeId: 31, completed: false },
+  { challengeId: 32, completed: false },
+  { challengeId: 33, completed: false },
+  { challengeId: 34, completed: false },
+  { challengeId: 35, completed: false },
+  { challengeId: 36, completed: false },
+  { challengeId: 37, completed: false },
+  { challengeId: 38, completed: false },
+  { challengeId: 39, completed: false },
+  { challengeId: 40, completed: false },
 ];
 
 export default function LessonPage() {
@@ -55,7 +55,7 @@ export default function LessonPage() {
   const navigate = useNavigate();
 
   const [lesson, setLesson] = useState(
-    dummyLessons.find((l) => l.id === Number(id)),
+    lessons.find((l) => l.id === Number(id))
   );
   const [userChallengeProgress, setUserChallengeProgress] =
     useState(dummyUserProgress);
@@ -67,9 +67,9 @@ export default function LessonPage() {
           <p className="text-xl">Lesson not found.</p>
           <Button
             className="text-stronger-blue flex gap-2"
-            onClick={() => navigate('/learn')}
+            onClick={() => navigate("/learn")}
           >
-            <ArrowLeft className="text-stronger-blue" />{' '}
+            <ArrowLeft className="text-stronger-blue" />{" "}
             <span className="text-stronger-blue">Back to Learn</span>
           </Button>
         </div>
@@ -78,8 +78,8 @@ export default function LessonPage() {
 
   const isLessonCompleted = lesson.challenges.every((challenge) =>
     userChallengeProgress.some(
-      (progress) => progress.challengeId === challenge.id && progress.completed,
-    ),
+      (progress) => progress.challengeId === challenge.id && progress.completed
+    )
   );
 
   // Mock function to update progress
@@ -98,14 +98,14 @@ export default function LessonPage() {
 
   return (
     <>
-      {lesson.lessonType === 'QUIZ' ? (
+      {lesson.lessonType === "QUIZ" ? (
         <Quiz
           lesson={{
             ...lesson,
             challenges: lesson.challenges.map((challenge) => ({
               ...challenge,
               completed: userChallengeProgress.some(
-                (p) => p.challengeId === challenge.id && p.completed,
+                (p) => p.challengeId === challenge.id && p.completed
               ),
             })),
           }}

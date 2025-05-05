@@ -1,14 +1,14 @@
-import { getUser, signInWithEmail, signOut, signUpNewUser } from '@/api/auth';
-import { LoginBody, RegisterBody } from '@/api/schema';
-import { User } from '@supabase/supabase-js';
+import { getUser, signInWithEmail, signOut, signUpNewUser } from "@/api/auth";
+import { LoginBody, RegisterBody } from "@/api/schema";
+import { User } from "@supabase/supabase-js";
 import React, {
   ReactNode,
   createContext,
   useContext,
   useEffect,
   useState,
-} from 'react';
-import { useNavigate } from 'react-router-dom';
+} from "react";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
@@ -34,11 +34,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (res.user) {
           setUser(res.user);
         } else {
-          navigate('/login');
+          navigate("/login");
         }
       })
       .catch((error) => {
-        console.error('Error fetching user:', error);
+        console.error("Error fetching user:", error);
       });
   }, [navigate]);
 
@@ -49,10 +49,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Set user
       setUser(res.user);
 
-      navigate('/profile');
+      navigate("/profile");
     } catch (error) {
-      console.error('Error signing in:', error);
-      return;
+      console.error("Error signing in:", error);
+      throw new Error("Email or password is incorrect");
+      // return;
     }
   };
 
@@ -62,9 +63,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Set user
       setUser(res.user);
-      navigate('/profile');
+      navigate("/profile");
     } catch (error) {
-      console.error('Error signing in:', error);
+      console.error("Error signing in:", error);
       return;
     }
   };
@@ -74,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     await signOut();
 
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -87,7 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
