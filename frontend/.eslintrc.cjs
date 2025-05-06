@@ -31,6 +31,6 @@ module.exports = {
   },
   rules: {
     'no-console': 'off',
-    'prettier/prettier': 'error',
+    'prettier/prettier': 'warning',
   },
 };

@@ -1,0 +1,8 @@
+CREATE TABLE user_learn (
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  lesson_id INT NOT NULL,
+  completed BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, lesson_id)
+);

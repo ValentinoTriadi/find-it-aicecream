@@ -1,0 +1,9 @@
+CREATE TABLE "users" (
+  id UUID PRIMARY KEY,
+  nama TEXT NOT NULL,
+  experience FLOAT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW(),
+  FOREIGN KEY (id) REFERENCES auth.users(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);

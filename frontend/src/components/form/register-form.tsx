@@ -1,16 +1,14 @@
-'use client';
+"use client";
 
-import { signUpNewUser } from '@/api/auth';
-import { useAuth } from '@/context/auth.context';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Cookies from 'js-cookie';
-import { Eye, EyeOffIcon } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { z } from 'zod';
+import { useAuth } from "@/context/auth.context";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOffIcon } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 
-import { Button } from '../ui/button';
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -18,16 +16,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../ui/form';
-import { Input } from '../ui/input';
+} from "../ui/form";
+import { Input } from "../ui/input";
 
 const registerSchema = z.object({
-  fullName: z.string().min(1, 'Nama lengkap harus diisi'),
-  email: z.string().email('Email yang dimasukkan salah'),
-  password: z.string().min(8, 'Password harus memilki minimal 8 karakter'),
+  fullName: z.string().min(1, "Nama lengkap harus diisi"),
+  email: z.string().email("Email yang dimasukkan salah"),
+  password: z.string().min(8, "Password harus memilki minimal 8 karakter"),
   confirmPaswsword: z
     .string()
-    .min(8, 'Password harus memilki minimal 8 karakter'),
+    .min(8, "Password harus memilki minimal 8 karakter"),
 });
 
 export const RegisterForm = () => {
@@ -40,16 +38,16 @@ export const RegisterForm = () => {
   const registerForm = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      fullName: '',
-      email: '',
-      password: '',
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPaswsword: "",
     },
   });
 
   async function onSubmit(data: z.infer<typeof registerSchema>) {
-    console.log(data);
     if (data.password !== data.confirmPaswsword) {
-      alert('Password tidak sama');
+      alert("Password tidak sama");
       return;
     }
 
@@ -60,7 +58,7 @@ export const RegisterForm = () => {
         name: data.fullName,
       });
     } catch (error) {
-      console.error('Error signing in:', error);
+      console.error("Error signing in:", error);
       return;
     }
   }
@@ -118,13 +116,13 @@ export const RegisterForm = () => {
                 <div className="flex w-full relative">
                   <Input
                     id="password"
-                    type={isPasswordShown ? 'text' : 'password'}
+                    type={isPasswordShown ? "text" : "password"}
                     placeholder="Enter Your password"
                     {...field}
                   />
                   <Button
                     className="absolute right-0"
-                    variant={'ghost'}
+                    variant={"ghost"}
                     onClick={() => setPasswordShown(!isPasswordShown)}
                     type="button"
                   >
@@ -150,13 +148,13 @@ export const RegisterForm = () => {
                 <div className="flex w-full relative">
                   <Input
                     id="password"
-                    type={isConfirmPasswordShown ? 'text' : 'password'}
+                    type={isConfirmPasswordShown ? "text" : "password"}
                     placeholder="Enter Your password"
                     {...field}
                   />
                   <Button
                     className="absolute right-0"
-                    variant={'ghost'}
+                    variant={"ghost"}
                     onClick={() =>
                       setConfirmPasswordShown(!isConfirmPasswordShown)
                     }

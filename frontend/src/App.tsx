@@ -1,17 +1,17 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from "react-router-dom";
 
-import './App.css';
-import ProtectedMenuLayout from './layout/menu-layout';
-import AchievementsPage from './pages/achievement';
-import BattleGame from './pages/battle-game';
-import BattlePage from './pages/battle-map';
-import LandingPage from './pages/landing';
-import LeaderboardPage from './pages/leaderboard';
-import LearnPage from './pages/learn';
-import LessonPage from './pages/lesson';
-import LoginPage from './pages/login';
-import ProfilePage from './pages/profile';
-import RegisterPage from './pages/register';
+import "./App.css";
+import ProtectedMenuLayout from "./layout/menu-layout";
+import AchievementsPage from "./pages/achievement";
+import BattleGame from "./pages/battle-game";
+import BattlePage from "./pages/battle-map";
+import LandingPage from "./pages/landing";
+import LeaderboardPage from "./pages/leaderboard";
+import LearnPage from "./pages/learn";
+import LessonPage from "./pages/lesson";
+import LoginPage from "./pages/login";
+import ProfilePage from "./pages/profile";
+import RegisterPage from "./pages/register";
 
 function App() {
   return (
@@ -27,7 +27,10 @@ function App() {
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/achievements" element={<AchievementsPage />} />
       </Route>
-      <Route path="/battle/:roomId/:topicId/:subtopicId" element={<BattleGame />} />
+      <Route
+        path="/battle/:roomId/:topicId/:subtopicId"
+        element={<BattleGame />}
+      />
     </Routes>
   );
 }

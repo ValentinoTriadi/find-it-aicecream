@@ -1,6 +1,6 @@
-import supabase from '@/utils/supabase';
+import supabase from "@/utils/supabase";
 
-import { LoginBody, RegisterBody } from './schema';
+import { LoginBody, RegisterBody } from "./schema";
 
 export async function signUpNewUser({ email, password, name }: RegisterBody) {
   const { data, error } = await supabase.auth.signUp({
@@ -8,7 +8,7 @@ export async function signUpNewUser({ email, password, name }: RegisterBody) {
     password: password,
     options: {
       data: {
-        name: name,
+        nama: name,
       },
     },
   });
@@ -17,7 +17,18 @@ export async function signUpNewUser({ email, password, name }: RegisterBody) {
     throw new Error(error.message);
   }
 
-  console.log('User signed up:', data);
+  // Update user profile name
+  const res = await supabase
+    .from("user")
+    .update({ nama: name })
+    .eq("id", data.user?.id);
+
+  if (res.error) {
+    console.log("Update profile error:", res);
+    throw new Error(res.error?.message);
+  }
+
+  console.log("User signed up:", data);
   return data;
 }
 
@@ -31,7 +42,7 @@ export async function signInWithEmail({ email, password }: LoginBody) {
     throw new Error(error.message);
   }
 
-  console.log('User signed in:', data);
+  console.log("User signed in:", data);
   return data;
 }
 
@@ -42,7 +53,7 @@ export async function signOut() {
     throw new Error(error.message);
   }
 
-  console.log('User signed out');
+  console.log("User signed out");
 }
 
 export async function getUser() {
@@ -52,6 +63,6 @@ export async function getUser() {
     throw new Error(error.message);
   }
 
-  console.log('User data:', data);
+  console.log("User data:", data);
   return data;
 }
