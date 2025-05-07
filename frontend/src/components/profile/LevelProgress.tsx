@@ -1,23 +1,51 @@
 interface LevelProgressProps {
-  level: number;
-  role: string;
   exp: number;
-  maxExp: number;
-  nextLevelExp: number;
 }
 
-export default function LevelProgress({
-  level,
-  role,
-  exp,
-  maxExp,
-  nextLevelExp,
-}: LevelProgressProps) {
+const calculateExp = (exp: number) => {
+  const base = 2;
+  const initialThreshold = 500;
+  let lvl = 1;
+  let nextLevelExp = initialThreshold;
+  let maxExp = initialThreshold;
+
+  while (exp >= initialThreshold * Math.pow(base, lvl - 1)) {
+    lvl++;
+    maxExp = initialThreshold * Math.pow(base, lvl);
+    nextLevelExp = initialThreshold * Math.pow(base, lvl - 1) - exp;
+    if (nextLevelExp < 0) {
+      nextLevelExp = maxExp;
+    }
+  }
+
+  let role = "Beginner";
+  if (lvl < 3) {
+    role = "Beginner";
+  } else if (lvl < 5) {
+    role = "Intermediate";
+  } else if (lvl < 7) {
+    role = "Advanced";
+  } else if (lvl < 10) {
+    role = "Expert";
+  } else {
+    role = "Master";
+  }
+
+  return {
+    lvl,
+    nextLevelExp,
+    maxExp,
+    role,
+  };
+};
+
+export default function LevelProgress({ exp }: LevelProgressProps) {
+  const { lvl, nextLevelExp, maxExp, role } = calculateExp(exp);
   return (
     <div className="rounded-xl bg-card p-6">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h2 className="text-xl font-bold text-dark-blue">Level {level}</h2>
+          <h2 className="text-xl font-bold text-dark-blue">Level {lvl}</h2>
           <p className="text-gray-500">{role}</p>
         </div>
         <div className="text-right">

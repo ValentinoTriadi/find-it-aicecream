@@ -48,7 +48,9 @@ export default function AppSidebar() {
             />
           </div>
           <div>
-            <h3 className="font-bold">{auth.user?.user_metadata.nama}</h3>
+            <h3 className="font-bold truncate max-w-[150px] text-white">
+              {auth.user?.user_metadata.nama}
+            </h3>
             <p className="text-sm text-gray-300">{profile.role}</p>
           </div>
         </Link>
