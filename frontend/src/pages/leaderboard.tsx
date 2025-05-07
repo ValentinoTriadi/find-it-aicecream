@@ -1,77 +1,81 @@
-import { Award, BookOpen, Medal, Swords, Trophy } from 'lucide-react';
-import type React from 'react';
-import { useState } from 'react';
+import { Medal } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/auth.context";
+import { fetchLeaderboard, fetchCurrentUser } from "@/api/leaderboard";
+import { cn } from "../lib/utils";
 
-import { cn } from '../lib/utils';
-
-// Configuration
 const TOP_X = 10;
 const AVATAR_WIDTH = 80;
 const AVATAR_HEIGHT = 80;
 
-// Sample data for the leaderboard
-const dummyLeaderboardData = [
-  { id: 1, username: 'LinguaChamp', score: 9850 },
-  { id: 2, username: 'WordWizard', score: 9720 },
-  { id: 3, username: 'PolyglotPro', score: 9540 },
-  { id: 4, username: 'VerbMaster', score: 9320 },
-  { id: 5, username: 'SyntaxSage', score: 9150 },
-  { id: 6, username: 'GrammarGuru', score: 8970 },
-  { id: 7, username: 'PhrasePioneer', score: 8820 },
-  { id: 8, username: 'AccentAce', score: 8640 },
-  { id: 9, username: 'DialogueDiva', score: 8470 },
-  { id: 10, username: 'VocabVirtuoso', score: 8320 },
-  { id: 11, username: 'Maul Firdaus', score: 7950 },
-  { id: 12, username: 'ToneTalent', score: 7840 },
-];
-
-const dummyCurrentUser = { id: 11, username: 'Maul Firdaus', rank: 'Beginner' };
 export default function LeaderboardPage() {
-  const [leaderboardData, setLeaderboardData] = useState(dummyLeaderboardData);
-  const [currentUser, setCurrentUser] = useState(dummyCurrentUser);
+  const { user } = useAuth();
+  const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Sort and get top X users
+  useEffect(() => {
+    if (!user) return;
+    setLoading(true);
+
+    Promise.all([
+      fetchLeaderboard(TOP_X),
+      fetchCurrentUser(user.id),
+    ])
+      .then(([topUsers, currentUserData]) => {
+        setLeaderboardData(topUsers);
+        setCurrentUser(currentUserData);
+      })
+      .finally(() => setLoading(false));
+  }, [user]);
+
+  // Sort and get top X users (sudah diurutkan dari DB, tapi jaga-jaga)
   const topUsers = leaderboardData
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => b.experience - a.experience)
     .slice(0, TOP_X)
     .map((user, index) => ({
       ...user,
-
       badge:
         index === 0
-          ? 'gold'
+          ? "gold"
           : index === 1
-            ? 'silver'
-            : index === 2
-              ? 'bronze'
-              : undefined,
-      // Generate avatar URL with dynamic dimensions
-      avatar: `https://ui-avatars.com/api/?name=${user.username}&background=random&size=${AVATAR_HEIGHT}`,
+          ? "silver"
+          : index === 2
+          ? "bronze"
+          : undefined,
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        user.nama
+      )}&background=random&size=${AVATAR_HEIGHT}`,
     }));
 
   // Find current user data
-  const currentUserData = leaderboardData.find((u) => u.id === currentUser.id);
+  const currentUserData = leaderboardData.find((u) => u.id === currentUser?.id) || currentUser;
   const currentUserRank =
     leaderboardData
-      .sort((a, b) => b.score - a.score)
-      .findIndex((u) => u.id === currentUser.id) + 1;
+      .sort((a, b) => b.experience - a.experience)
+      .findIndex((u) => u.id === currentUser?.id) + 1;
 
   // Add badge and avatar to current user if not in top X
   const enhancedCurrentUser = currentUserData
     ? {
         ...currentUserData,
-        avatar: `https://ui-avatars.com/api/?name=${currentUser.username}&background=random&size=${AVATAR_HEIGHT}`,
-        // Only add badge if in top 3
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          currentUserData.nama
+        )}&background=random&size=${AVATAR_HEIGHT}`,
         badge:
           currentUserRank <= 3
             ? currentUserRank === 1
-              ? 'gold'
+              ? "gold"
               : currentUserRank === 2
-                ? 'silver'
-                : 'bronze'
+              ? "silver"
+              : "bronze"
             : undefined,
       }
     : null;
+
+  if (loading) {
+    return <div className="p-8 text-center">Loading leaderboard...</div>;
+  }
 
   return (
     <div className="flex-1 overflow-auto relative">
@@ -90,8 +94,8 @@ export default function LeaderboardPage() {
               <div
                 key={user.id}
                 className={cn(
-                  'grid grid-cols-12 py-3 px-4 items-center',
-                  user.id === currentUser.id ? 'bg-blue-50' : '',
+                  "grid grid-cols-12 py-3 px-4 items-center",
+                  user.id === currentUser?.id ? "bg-blue-50" : ""
                 )}
               >
                 <div className="col-span-1 font-medium text-gray-700">
@@ -100,11 +104,11 @@ export default function LeaderboardPage() {
                 <div className="col-span-7 flex items-center space-x-3">
                   <UserWithAvatar
                     user={user}
-                    isCurrent={user.id === currentUser.id}
+                    isCurrent={user.id === currentUser?.id}
                   />
                 </div>
                 <div className="col-span-4 text-right font-medium">
-                  {user.score.toLocaleString()} XP
+                  {user.experience?.toLocaleString() ?? 0} XP
                 </div>
               </div>
             ))}
@@ -125,7 +129,7 @@ export default function LeaderboardPage() {
                   <UserWithAvatar user={enhancedCurrentUser} isCurrent />
                 </div>
                 <div className="col-span-4 text-right text-dark-blue font-medium">
-                  {enhancedCurrentUser.score.toLocaleString()} XP
+                  {enhancedCurrentUser.experience?.toLocaleString() ?? 0} XP
                 </div>
               </div>
             </div>
@@ -141,7 +145,7 @@ function UserWithAvatar({
   user,
   isCurrent,
 }: {
-  user: { avatar: string; username: string; badge?: string };
+  user: { avatar: string; nama: string; badge?: string };
   isCurrent?: boolean;
 }) {
   return (
@@ -152,19 +156,19 @@ function UserWithAvatar({
         >
           <img
             src={user.avatar}
-            alt={`${user.username}'s avatar`}
+            alt={`${user.nama}'s avatar`}
             className="w-full h-full object-cover"
           />
         </div>
         {user.badge && (
           <div
             className={cn(
-              'absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center',
-              user.badge === 'gold'
-                ? 'bg-yellow-400'
-                : user.badge === 'silver'
-                  ? 'bg-gray-300'
-                  : 'bg-amber-600',
+              "absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center",
+              user.badge === "gold"
+                ? "bg-yellow-400"
+                : user.badge === "silver"
+                ? "bg-gray-300"
+                : "bg-amber-600"
             )}
           >
             <Medal size={12} className="text-white" />
@@ -173,12 +177,12 @@ function UserWithAvatar({
       </div>
       <span
         className={cn(
-          'font-medium',
-          isCurrent ? 'text-dark-blue' : 'text-gray-800',
+          "font-medium",
+          isCurrent ? "text-dark-blue" : "text-gray-800"
         )}
       >
-        {user.username}
-        {isCurrent && ' (You)'}
+        {user.nama}
+        {isCurrent && " (You)"}
       </span>
     </>
   );
