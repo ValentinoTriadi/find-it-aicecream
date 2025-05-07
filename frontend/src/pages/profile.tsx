@@ -98,7 +98,7 @@ const ProfilePage = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as "Stats" | "Achievement")}
-                className={`px-6 py-2 rounded-md ${
+                className={`px-6 py-2 rounded-[4px] ${
                   activeTab === tab
                     ? "bg-white text-[#0a3b56] font-medium"
                     : "text-[#0a3b56] hover:bg-white/50"

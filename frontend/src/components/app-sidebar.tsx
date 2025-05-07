@@ -87,9 +87,12 @@ export default function AppSidebar() {
         </SidebarGroup>
 
         <SidebarFooter className="mt-auto">
-          <div className="p-4 flex items-center justify-center mt-auto ">
+          <Link
+            to={"/"}
+            className="p-4 flex items-center justify-center mt-auto "
+          >
             <img src="/images/battletalk-logo.png" className="w-32" />
-          </div>
+          </Link>
         </SidebarFooter>
       </SidebarContent>
     </Sidebar>

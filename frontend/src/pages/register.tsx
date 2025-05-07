@@ -1,7 +1,12 @@
-import { RegisterForm } from '@/components/form/register-form';
-import { Link } from 'react-router-dom';
+import { RegisterForm } from "@/components/form/register-form";
+import { useAuth } from "@/context/auth.context";
+import { Link } from "react-router-dom";
 
 const RegisterPage = () => {
+  const auth = useAuth();
+  if (auth.user) {
+    window.location.href = "/";
+  }
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -21,7 +26,7 @@ const RegisterPage = () => {
 
             <div className="mt-6 text-center">
               <p className="text-gray-600">
-                Already have an account?{' '}
+                Already have an account?{" "}
                 <Link
                   to="/login"
                   className="text-stronger-blue hover:underline"

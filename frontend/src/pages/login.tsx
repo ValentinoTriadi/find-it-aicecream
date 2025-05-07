@@ -1,8 +1,13 @@
-import { LoginForm } from '@/components/form/login-form';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Link } from 'react-router-dom';
+import { LoginForm } from "@/components/form/login-form";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useAuth } from "@/context/auth.context";
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
+  const auth = useAuth();
+  if (auth.user) {
+    window.location.href = "/";
+  }
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -22,7 +27,7 @@ const LoginPage = () => {
 
             <div className="mt-6 text-center">
               <p className="text-gray-600">
-                Don't have an account?{' '}
+                Don't have an account?{" "}
                 <Link
                   to="/register"
                   className="text-stronger-blue hover:underline"
