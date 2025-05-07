@@ -1,7 +1,7 @@
-import supabase from '@/utils/supabase';
+import supabase from "@/utils/supabase";
 
 export async function getAllTopic() {
-  const { data, error } = await supabase.from('topic').select('*');
+  const { data, error } = await supabase.from("topic").select("*");
 
   if (error) {
     throw new Error(error.message);
@@ -11,9 +11,9 @@ export async function getAllTopic() {
 }
 export async function getTopicById(id: number) {
   const { data, error } = await supabase
-    .from('topic')
-    .select('*')
-    .eq('id', id)
+    .from("topic")
+    .select("*")
+    .eq("id", id)
     .single();
 
   if (error) {
@@ -24,9 +24,9 @@ export async function getTopicById(id: number) {
 }
 export async function getAllSubTopic(topicId: number) {
   const { data, error } = await supabase
-    .from('sub_topic')
-    .select('*')
-    .eq('topic_id', topicId);
+    .from("sub_topic")
+    .select("*")
+    .eq("topic_id", topicId);
 
   if (error) {
     throw new Error(error.message);
@@ -36,9 +36,9 @@ export async function getAllSubTopic(topicId: number) {
 }
 export async function getSubTopicById(id: number) {
   const { data, error } = await supabase
-    .from('sub_topic')
-    .select('*')
-    .eq('id', id)
+    .from("sub_topic")
+    .select("*")
+    .eq("id", id)
     .single();
 
   if (error) {
@@ -49,9 +49,9 @@ export async function getSubTopicById(id: number) {
 }
 export async function getAllSubTopicWithStar(topicId: number) {
   const { data, error } = await supabase
-    .from('sub_topic')
-    .select('*, sub_topic_star(*)')
-    .eq('topic_id', topicId);
+    .from("sub_topic")
+    .select("*, sub_topic_star(*)")
+    .eq("topic_id", topicId);
 
   if (error) {
     throw new Error(error.message);
@@ -61,13 +61,13 @@ export async function getAllSubTopicWithStar(topicId: number) {
 }
 export async function getAllSubTopicWithStarByUserId(
   topicId: number,
-  userId: string,
+  userId: string
 ) {
   const { data, error } = await supabase
-    .from('sub_topic')
-    .select('*, sub_topic_star(*)')
-    .eq('topic_id', topicId)
-    .filter('sub_topic_star.user_id', 'eq', userId);
+    .from("sub_topic")
+    .select("*, sub_topic_star(*)")
+    .eq("topic_id", topicId)
+    .filter("sub_topic_star.user_id", "eq", userId);
 
   if (error) {
     throw new Error(error.message);
@@ -77,9 +77,9 @@ export async function getAllSubTopicWithStarByUserId(
 }
 export async function getCountStarUser(userId: string) {
   const { data, error } = await supabase
-    .from('sub_topic_star')
-    .select('*', { count: 'exact' })
-    .eq('user_id', userId);
+    .from("sub_topic_star")
+    .select("*", { count: "exact" })
+    .eq("user_id", userId);
 
   if (error) {
     throw new Error(error.message);
@@ -96,9 +96,9 @@ export async function getCountStarUser(userId: string) {
 }
 export async function getVictoryUser(userId: string) {
   const { data, error } = await supabase
-    .from('sub_topic_star')
-    .select('*', { count: 'exact' })
-    .eq('user_id', userId);
+    .from("sub_topic_star")
+    .select("*", { count: "exact" })
+    .eq("user_id", userId);
 
   if (error) {
     throw new Error(error.message);
@@ -121,16 +121,16 @@ export async function getVictoryUser(userId: string) {
  */
 export async function getLastSubTopicDone(topicId: number, userId: string) {
   const { data, error } = await supabase
-    .from('sub_topic_star')
-    .select('sub_topic_id')
-    .eq('user_id', userId)
+    .from("sub_topic_star")
+    .select("sub_topic_id")
+    .eq("user_id", userId)
     .in(
-      'sub_topic_id',
+      "sub_topic_id",
       (
-        await supabase.from('sub_topic').select('id').eq('topic_id', topicId)
-      ).data?.map((subTopic) => subTopic.id) || [],
+        await supabase.from("sub_topic").select("id").eq("topic_id", topicId)
+      ).data?.map((subTopic) => subTopic.id) || []
     )
-    .order('sub_topic_id', { ascending: false })
+    .order("sub_topic_id", { ascending: false })
     .limit(1);
 
   if (error) {

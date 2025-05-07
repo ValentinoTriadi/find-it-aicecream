@@ -1,11 +1,9 @@
 "use client";
 
-import { useAuth } from "@/context/auth.context";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOffIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 import { Button } from "../ui/button";
@@ -19,95 +17,47 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 
-const registerSchema = z.object({
-  fullName: z.string().min(1, "Nama lengkap harus diisi"),
-  email: z.string().email("Email yang dimasukkan salah"),
+const resetPasswordSchema = z.object({
   password: z.string().min(8, "Password harus memilki minimal 8 karakter"),
   confirmPassword: z
     .string()
     .min(8, "Password harus memilki minimal 8 karakter"),
 });
 
-export const RegisterForm = () => {
+export const ResetPasswordForm = () => {
   const [isPasswordShown, setPasswordShown] = useState<boolean>(false);
   const [isConfirmPasswordShown, setConfirmPasswordShown] =
     useState<boolean>(false);
 
-  const auth = useAuth();
-  const navigate = useNavigate();
-  const registerForm = useForm<z.infer<typeof registerSchema>>({
-    resolver: zodResolver(registerSchema),
+  const resetPasswordForm = useForm<z.infer<typeof resetPasswordSchema>>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      fullName: "",
-      email: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  async function onSubmit(data: z.infer<typeof registerSchema>) {
+  async function onSubmit(data: z.infer<typeof resetPasswordSchema>) {
     if (data.password !== data.confirmPassword) {
       alert("Password tidak sama");
       return;
     }
 
     try {
-      await auth.register({
-        email: data.email,
-        password: data.password,
-        name: data.fullName,
-      });
     } catch (error) {
       console.error("Error signing in:", error);
       return;
     }
   }
+
   return (
-    <Form {...registerForm}>
+    <Form {...resetPasswordForm}>
       <form
-        onSubmit={registerForm.handleSubmit(onSubmit)}
+        onSubmit={resetPasswordForm.handleSubmit(onSubmit)}
         className="space-y-8"
       >
         <FormField
-          control={registerForm.control}
-          name="fullName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nama Lengkap</FormLabel>
-              <FormControl>
-                <Input
-                  id="full-name"
-                  type="fullName"
-                  placeholder="Masukkan nama lengkap kamu"
-                  {...field}
-                />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        ></FormField>
-        <FormField
-          control={registerForm.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Masukkan email kamu"
-                  {...field}
-                />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        ></FormField>
-        <FormField
-          control={registerForm.control}
+          control={resetPasswordForm.control}
           name="password"
           render={({ field }) => (
             <FormItem>
@@ -139,7 +89,7 @@ export const RegisterForm = () => {
           )}
         />
         <FormField
-          control={registerForm.control}
+          control={resetPasswordForm.control}
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
@@ -176,7 +126,7 @@ export const RegisterForm = () => {
           type="submit"
           className="w-full bg-stronger-blue hover:bg-more-stronger-blue text-white"
         >
-          Register
+          Reset Password
         </Button>
       </form>
     </Form>

@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOffIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 import { Button } from "../ui/button";
@@ -107,6 +107,15 @@ export const LoginForm = () => {
             </FormItem>
           )}
         />
+        {/* <div className="flex justify-start">
+          <Link
+            to="/forgot-password"
+            className="text-sm hover:text-more-stronger-blue text-stronger-blue hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div> */}
+
         {errorMessage && (
           <div className="text-red-500 text-sm text-center">{errorMessage}</div>
         )}

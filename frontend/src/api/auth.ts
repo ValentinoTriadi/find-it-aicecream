@@ -19,7 +19,7 @@ export async function signUpNewUser({ email, password, name }: RegisterBody) {
 
   // Update user profile name
   const res = await supabase
-    .from("user")
+    .from("users")
     .update({ nama: name })
     .eq("id", data.user?.id);
 
@@ -54,6 +54,18 @@ export async function signOut() {
   }
 
   console.log("User signed out");
+}
+
+export async function forgetPassword(email: string) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: "/reset-password",
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  console.log("Password reset email sent");
 }
 
 export async function getUser() {

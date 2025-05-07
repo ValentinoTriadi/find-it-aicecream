@@ -90,7 +90,7 @@ const ProfilePage = () => {
         <LevelProgress
           level={userData.level}
           role={userData.role}
-          exp={userData.exp}
+          exp={auth.exp || userData.exp}
           maxExp={userData.maxExp}
           nextLevelExp={userData.nextLevelExp}
         />

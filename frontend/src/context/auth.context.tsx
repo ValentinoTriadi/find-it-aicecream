@@ -1,5 +1,7 @@
 import { getUser, signInWithEmail, signOut, signUpNewUser } from "@/api/auth";
 import { LoginBody, RegisterBody } from "@/api/schema";
+import { getUserXP } from "@/api/user";
+import supabase from "@/utils/supabase";
 import { User } from "@supabase/supabase-js";
 import React, {
   ReactNode,
@@ -12,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
+  exp: number | null;
   login: (body: LoginBody) => void;
   register: (body: RegisterBody) => void;
   logout: () => void;
@@ -25,6 +28,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [exp, setExp] = useState<number | null>(null);
 
   const navigate = useNavigate();
 
@@ -41,6 +45,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.error("Error fetching user:", error);
       });
   }, [navigate]);
+
+  useEffect(() => {
+    getUserXP(user?.id || "")
+      .then((res) => {
+        if (res) {
+          setExp(res);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching user XP:", error);
+      });
+  }, [user]);
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log("Auth event:", event);
+      }
+    );
+  }, []);
 
   const login = async (body: LoginBody) => {
     try {
@@ -79,7 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, exp, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
