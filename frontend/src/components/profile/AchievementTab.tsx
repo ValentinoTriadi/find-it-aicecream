@@ -1,3 +1,6 @@
+// src/components/profile/AchievementTab.tsx
+import { Trophy } from "lucide-react";
+
 interface Achievement {
   title: string;
   icon: JSX.Element;

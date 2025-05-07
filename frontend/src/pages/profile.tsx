@@ -4,16 +4,9 @@ import ProfileHeader from "@/components/profile/ProfileHeader";
 import StatsTab from "@/components/profile/StatsTab";
 import { useAuth } from "@/context/auth.context";
 import { useUser } from "@/context/user.context";
-import {
-  Award,
-  BarChart2,
-  BookOpen,
-  MessageSquare,
-  Star,
-  Swords,
-  Trophy,
-} from "lucide-react";
-import { useState } from "react";
+import { Trophy } from "lucide-react";
+import { useEffect, useState } from "react";
+import { fetchAllAchievements, fetchUserAchievements } from "@/api/achievement";
 
 const DummyUserData = {
   name: "John Doe",
@@ -23,8 +16,8 @@ const DummyUserData = {
   exp: 1250,
   maxExp: 2000,
   nextLevelExp: 750,
-  achievementsUnlocked: 12,
-  totalAchievements: 30,
+  achievementsUnlocked: 0,
+  totalAchievements: 0,
   battleStats: {
     battlesWon: 7,
     battleStars: 18,
@@ -38,44 +31,42 @@ const DummyUserData = {
   },
 };
 
-const DummyAchievements = [
-  {
-    title: "First Battle Won",
-    icon: <Trophy className="w-5 h-5 text-[#5bb4e5]" />,
-    description: "Win your first battle.",
-  },
-  {
-    title: "Grammar Guru",
-    icon: <BookOpen className="w-5 h-5 text-[#5bb4e5]" />,
-    description: "Master grammar skills.",
-  },
-  {
-    title: "Vocabulary Vault",
-    icon: <Award className="w-5 h-5 text-[#5bb4e5]" />,
-    description: "Reach vocab level 3.",
-  },
-  {
-    title: "Listening Legend",
-    icon: <BarChart2 className="w-5 h-5 text-[#5bb4e5]" />,
-    description: "Level up listening skill.",
-  },
-  {
-    title: "Speak Up!",
-    icon: <MessageSquare className="w-5 h-5 text-[#5bb4e5]" />,
-    description: "Finish 5 speaking battles.",
-  },
-  {
-    title: "Consistent Learner",
-    icon: <Star className="w-5 h-5 text-[#5bb4e5]" />,
-    description: "Log in 7 days in a row.",
-  },
-];
 const ProfilePage = () => {
   const auth = useAuth();
   const profile = useUser();
   const [activeTab, setActiveTab] = useState<"Stats" | "Achievement">("Stats");
   const [userData, setUserData] = useState(DummyUserData);
-  const [achievements, setAchievements] = useState(DummyAchievements);
+  const [achievements, setAchievements] = useState<
+    { title: string; icon: JSX.Element; description: string }[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!auth.user) return;
+    setLoading(true);
+
+    Promise.all([fetchAllAchievements(), fetchUserAchievements(auth.user.id)])
+      .then(([all, user]) => {
+        // Gabungkan dan tambahkan icon Trophy untuk semua achievement
+        const merged = all.map((a: any) => {
+          const userA = user.find((ua: any) => ua.achievement_id === a.id);
+          return {
+            title: a.title,
+            icon: <Trophy className="w-5 h-5 text-[#5bb4e5]" />,
+            description: a.description,
+            completed: userA ? userA.completed : false,
+          };
+        });
+        setAchievements(merged);
+        setUserData((prev) => ({
+          ...prev,
+          achievementsUnlocked: merged.filter((a) => a.completed).length,
+          totalAchievements: merged.length,
+        }));
+      })
+      .finally(() => setLoading(false));
+  }, [auth.user]);
+
   return (
     <div className="flex-1 p-8 overflow-auto">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -118,13 +109,16 @@ const ProfilePage = () => {
           />
         )}
 
-        {activeTab === "Achievement" && (
-          <AchievementTab
-            unlocked={userData.achievementsUnlocked}
-            total={userData.totalAchievements}
-            achievements={achievements}
-          />
-        )}
+        {activeTab === "Achievement" &&
+          (loading ? (
+            <div className="p-8 text-center">Loading achievements...</div>
+          ) : (
+            <AchievementTab
+              unlocked={userData.achievementsUnlocked}
+              total={userData.totalAchievements}
+              achievements={achievements}
+            />
+          ))}
       </div>
     </div>
   );
