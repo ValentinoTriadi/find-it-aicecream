@@ -1,11 +1,10 @@
-// src/pages/lesson/video.tsx
-import { useState } from 'react';
-import Confetti from 'react-confetti';
-import { useNavigate } from 'react-router-dom';
-import { useWindowSize } from 'react-use';
+import { useEffect, useState } from "react";
+import Confetti from "react-confetti";
+import { useNavigate } from "react-router-dom";
+import { useWindowSize } from "react-use";
 
-import { LessonFooter } from './LessonFooter';
-import { LessonHeader } from './LessonHeader';
+import { LessonFooter } from "./LessonFooter";
+import { LessonHeader } from "./LessonHeader";
 
 type VideoPlayerProps = {
   lesson: {
@@ -14,7 +13,7 @@ type VideoPlayerProps = {
     videoUrl: string | null;
   };
   isLessonCompleted: boolean;
-  markLessonComplete: (lessonId: number) => Promise<void>;
+  markLessonComplete: () => Promise<void>;
 };
 
 export const VideoPlayer = ({
@@ -27,18 +26,23 @@ export const VideoPlayer = ({
   const [isCompleted, setIsCompleted] = useState(isLessonCompleted);
   const [showConfetti, setShowConfetti] = useState(false);
 
+  useEffect(() => {
+    setIsCompleted(isLessonCompleted);
+  }, [isLessonCompleted]);
+
   const onComplete = async () => {
+    if (isCompleted) return;
     try {
-      await markLessonComplete(lesson.id);
+      await markLessonComplete();
       setIsCompleted(true);
       setShowConfetti(true);
     } catch (error) {
-      console.error('Failed to mark lesson as complete', error);
+      console.error("Failed to mark lesson as complete", error);
     }
   };
 
   const onContinue = () => {
-    navigate('/learn');
+    navigate("/learn");
   };
 
   if (showConfetti) {
@@ -53,7 +57,6 @@ export const VideoPlayer = ({
         />
         <div className="mx-auto flex h-full max-w-lg flex-col items-center justify-center gap-y-4 text-center lg:gap-y-8">
           <div className="text-6xl lg:text-8xl">🎉</div>
-
           <h1 className="text-lg font-bold text-neutral-700 lg:text-3xl">
             Great job! <br /> You've completed the lesson.
           </h1>
@@ -83,8 +86,8 @@ export const VideoPlayer = ({
       </div>
 
       <LessonFooter
-        disabled={false}
-        status={isCompleted ? 'completed' : 'none'}
+        disabled={isCompleted}
+        status={isCompleted ? "completed" : "none"}
         onCheck={onComplete}
         isVideoLesson
       />

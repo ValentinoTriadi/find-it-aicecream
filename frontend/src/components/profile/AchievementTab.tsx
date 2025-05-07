@@ -5,6 +5,7 @@ interface Achievement {
   title: string;
   icon: JSX.Element;
   description: string;
+  completed?: boolean;
 }
 
 interface AchievementTabProps {
@@ -18,6 +19,9 @@ export default function AchievementTab({
   total,
   achievements,
 }: AchievementTabProps) {
+  // Tampilkan hanya achievement yang sudah selesai
+  const completedAchievements = achievements.filter((ach) => ach.completed);
+
   return (
     <div className="bg-card rounded-xl p-6">
       <h3 className="text-lg font-semibold text-[#0a3b56] mb-4">
@@ -27,7 +31,7 @@ export default function AchievementTab({
         You have unlocked {unlocked} out of {total} achievements.
       </p>
       <div className="grid md:grid-cols-2 gap-4">
-        {achievements.slice(0, 4).map((ach, index) => (
+        {completedAchievements.slice(0, 4).map((ach, index) => (
           <div
             key={index}
             className="bg-white p-4 rounded-lg shadow flex items-start gap-3"
@@ -40,14 +44,19 @@ export default function AchievementTab({
           </div>
         ))}
       </div>
-      {achievements.length > 4 && (
+      {completedAchievements.length > 4 && (
         <div className="mt-4 text-center">
           <a
-            href="/achievement"
+            href="/achievements"
             className="text-sm font-medium text-[#0a3b56] hover:underline"
           >
             View More
           </a>
+        </div>
+      )}
+      {completedAchievements.length === 0 && (
+        <div className="text-center text-gray-500 mt-4">
+          You haven't unlocked any achievements yet.
         </div>
       )}
     </div>

@@ -1,18 +1,15 @@
 import { Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/auth.context";
-import {
-  fetchAllAchievements,
-  fetchUserAchievements,
-} from "@/api/achievement";
+import { fetchAllAchievements, fetchUserAchievements } from "@/api/achievement";
 
 type AchievementCategory = "All" | "Battle" | "Personal";
 
 interface Achievement {
-  id: number;
   title: string;
+  icon: JSX.Element;
   description: string;
-  category: "Battle" | "Personal";
+  completed?: boolean;
 }
 
 interface UserAchievement {
@@ -29,29 +26,30 @@ interface AchievementWithProgress extends Achievement {
 export default function AchievementsPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<AchievementCategory>("All");
-  const [allAchievements, setAllAchievements] = useState<AchievementWithProgress[]>([]);
+  const [allAchievements, setAllAchievements] = useState<
+    AchievementWithProgress[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     setLoading(true);
 
-    Promise.all([
-      fetchAllAchievements(),
-      fetchUserAchievements(user.id),
-    ])
+    Promise.all([fetchAllAchievements(), fetchUserAchievements(user.id)])
       .then(([achievements, userAchievements]) => {
         // Gabungkan data
-        const merged: AchievementWithProgress[] = achievements.map((a: Achievement) => {
-          const userA = userAchievements.find(
-            (ua: UserAchievement) => ua.achievement_id === a.id
-          );
-          return {
-            ...a,
-            progress: userA ? userA.progress : 0,
-            completed: userA ? userA.completed : false,
-          };
-        });
+        const merged: AchievementWithProgress[] = achievements.map(
+          (a: Achievement) => {
+            const userA = userAchievements.find(
+              (ua: UserAchievement) => ua.achievement_id === a.id
+            );
+            return {
+              ...a,
+              progress: userA ? userA.progress : 0,
+              completed: userA ? userA.completed : false,
+            };
+          }
+        );
         setAllAchievements(merged);
       })
       .finally(() => setLoading(false));

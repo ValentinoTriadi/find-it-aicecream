@@ -1,54 +1,36 @@
-// src/pages/learn/index.tsx
+import { useEffect, useState } from "react";
 import { Unit } from "@/components/learn/LearnUnit";
-import { useState } from "react";
 import { learnUnits as initialLearnUnits } from "@/utils/data-learn";
-
-// Sample user progress data
-const userChallengeProgress = [
-  { challengeId: 1, completed: false },
-  { challengeId: 2, completed: false },
-  { challengeId: 3, completed: false },
-  { challengeId: 4, completed: false },
-  { challengeId: 5, completed: false },
-  { challengeId: 6, completed: false },
-  { challengeId: 7, completed: false },
-  { challengeId: 8, completed: false },
-  { challengeId: 9, completed: false },
-  { challengeId: 10, completed: false },
-  { challengeId: 11, completed: false },
-  { challengeId: 12, completed: false },
-  { challengeId: 13, completed: false },
-  { challengeId: 14, completed: false },
-  { challengeId: 15, completed: false },
-  { challengeId: 16, completed: false },
-  { challengeId: 17, completed: false },
-  { challengeId: 18, completed: false },
-  { challengeId: 19, completed: false },
-  { challengeId: 20, completed: false },
-  { challengeId: 21, completed: false },
-  { challengeId: 22, completed: false },
-  { challengeId: 23, completed: false },
-  { challengeId: 24, completed: false },
-  { challengeId: 25, completed: false },
-  { challengeId: 26, completed: false },
-  { challengeId: 27, completed: false },
-  { challengeId: 28, completed: false },
-  { challengeId: 29, completed: false },
-  { challengeId: 30, completed: false },
-  { challengeId: 31, completed: false },
-  { challengeId: 32, completed: false },
-  { challengeId: 33, completed: false },
-  { challengeId: 34, completed: false },
-  { challengeId: 35, completed: false },
-  { challengeId: 36, completed: false },
-  { challengeId: 37, completed: false },
-  { challengeId: 38, completed: false },
-  { challengeId: 39, completed: false },
-  { challengeId: 40, completed: false },
-];
+import { fetchUserLearn } from "@/api/learn";
+import { useAuth } from "@/context/auth.context";
 
 export default function LearnPage() {
+  const { user } = useAuth();
   const [learnUnits, setLearnUnits] = useState(initialLearnUnits);
+  const [userLearnProgress, setUserLearnProgress] = useState<
+    { lessonId: number; completed: boolean }[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    setLoading(true);
+
+    fetchUserLearn(user.id)
+      .then((data) => {
+        // Mapping ke format yang dibutuhkan Unit
+        const progress = data.map((row: any) => ({
+          lessonId: row.lesson_id,
+          completed: row.completed,
+        }));
+        setUserLearnProgress(progress);
+      })
+      .finally(() => setLoading(false));
+  }, [user]);
+
+  if (loading) {
+    return <div className="p-8 text-center">Loading your progress...</div>;
+  }
 
   return (
     <div className="flex-1 p-8 overflow-auto">
@@ -61,7 +43,7 @@ export default function LearnPage() {
               description={unit.description}
               title={unit.title}
               lessons={unit.lessons}
-              userChallengeProgress={userChallengeProgress}
+              userLearnProgress={userLearnProgress}
             />
           </div>
         ))}

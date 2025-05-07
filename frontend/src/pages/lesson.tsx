@@ -1,64 +1,48 @@
-// src/pages/lesson/[id].tsx
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Quiz } from "@/components/learn/lesson/Quiz";
 import { VideoPlayer } from "@/components/learn/lesson/VideoPlayer";
 import { Button } from "@mui/material";
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { lessons } from "@/utils/data-lesson";
-
-const dummyUserProgress = [
-  { challengeId: 1, completed: false },
-  { challengeId: 2, completed: false },
-  { challengeId: 3, completed: false },
-  { challengeId: 4, completed: false },
-  { challengeId: 5, completed: false },
-  { challengeId: 6, completed: false },
-  { challengeId: 7, completed: false },
-  { challengeId: 8, completed: false },
-  { challengeId: 9, completed: false },
-  { challengeId: 10, completed: false },
-  { challengeId: 11, completed: false },
-  { challengeId: 12, completed: false },
-  { challengeId: 13, completed: false },
-  { challengeId: 14, completed: false },
-  { challengeId: 15, completed: false },
-  { challengeId: 16, completed: false },
-  { challengeId: 17, completed: false },
-  { challengeId: 18, completed: false },
-  { challengeId: 19, completed: false },
-  { challengeId: 20, completed: false },
-  { challengeId: 21, completed: false },
-  { challengeId: 22, completed: false },
-  { challengeId: 23, completed: false },
-  { challengeId: 24, completed: false },
-  { challengeId: 25, completed: false },
-  { challengeId: 26, completed: false },
-  { challengeId: 27, completed: false },
-  { challengeId: 28, completed: false },
-  { challengeId: 29, completed: false },
-  { challengeId: 30, completed: false },
-  { challengeId: 31, completed: false },
-  { challengeId: 32, completed: false },
-  { challengeId: 33, completed: false },
-  { challengeId: 34, completed: false },
-  { challengeId: 35, completed: false },
-  { challengeId: 36, completed: false },
-  { challengeId: 37, completed: false },
-  { challengeId: 38, completed: false },
-  { challengeId: 39, completed: false },
-  { challengeId: 40, completed: false },
-];
+import { useAuth } from "@/context/auth.context";
+import { fetchUserLearn, markLessonComplete } from "@/api/learn";
 
 export default function LessonPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [lesson, setLesson] = useState(
     lessons.find((l) => l.id === Number(id))
   );
-  const [userChallengeProgress, setUserChallengeProgress] =
-    useState(dummyUserProgress);
+  const [lessonCompleted, setLessonCompleted] = useState(false);
+  const [challengeStatus, setChallengeStatus] = useState<{
+    [id: number]: boolean;
+  }>({});
+  const [loading, setLoading] = useState(true);
+
+  // Fetch lesson progress dari DB
+  useEffect(() => {
+    if (!user || !lesson) return;
+    setLoading(true);
+    fetchUserLearn(user.id)
+      .then((data) => {
+        const found = data.find((row: any) => row.lesson_id === lesson.id);
+        setLessonCompleted(!!found?.completed);
+
+        // Jika lesson quiz, inisialisasi challengeStatus dari DB jika ingin (atau kosong)
+        if (lesson.lessonType === "QUIZ") {
+          // Inisialisasi semua challenge belum selesai
+          const status: { [id: number]: boolean } = {};
+          lesson.challenges.forEach((ch) => {
+            status[ch.id] = false;
+          });
+          setChallengeStatus(status);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [user, lesson]);
 
   if (!lesson)
     return (
@@ -76,25 +60,27 @@ export default function LessonPage() {
       </div>
     );
 
-  const isLessonCompleted = lesson.challenges.every((challenge) =>
-    userChallengeProgress.some(
-      (progress) => progress.challengeId === challenge.id && progress.completed
-    )
-  );
+  // Lesson dianggap selesai jika ada di user_learn dengan completed: true
+  const isLessonCompleted = lessonCompleted;
 
-  // Mock function to update progress
-  const markChallengeComplete = (challengeId: number) => {
-    setUserChallengeProgress((prev) => [
-      ...prev.filter((p) => p.challengeId !== challengeId),
-      { challengeId, completed: true },
-    ]);
-    return Promise.resolve();
+  // Mark challenge selesai (hanya di state, lesson progress tetap di DB)
+  const handleMarkChallengeComplete = async (challengeId: number) => {
+    setChallengeStatus((prev) => ({
+      ...prev,
+      [challengeId]: true,
+    }));
   };
 
-  const markLessonComplete = (lessonId: number) => {
-    // In a real app, you would update the lesson completion status
-    return Promise.resolve();
+  // Mark lesson selesai di DB
+  const handleMarkLessonComplete = async () => {
+    if (!user || !lesson) return;
+    await markLessonComplete(user.id, lesson.id);
+    setLessonCompleted(true);
   };
+
+  if (loading) {
+    return <div className="p-8 text-center">Loading lesson...</div>;
+  }
 
   return (
     <>
@@ -104,19 +90,17 @@ export default function LessonPage() {
             ...lesson,
             challenges: lesson.challenges.map((challenge) => ({
               ...challenge,
-              completed: userChallengeProgress.some(
-                (p) => p.challengeId === challenge.id && p.completed
-              ),
+              completed: challengeStatus[challenge.id] || false,
             })),
           }}
           isLessonCompleted={isLessonCompleted}
-          markChallengeComplete={markChallengeComplete}
+          markChallengeComplete={handleMarkChallengeComplete}
         />
       ) : (
         <VideoPlayer
           lesson={lesson}
           isLessonCompleted={isLessonCompleted}
-          markLessonComplete={markLessonComplete}
+          markLessonComplete={handleMarkLessonComplete}
         />
       )}
     </>

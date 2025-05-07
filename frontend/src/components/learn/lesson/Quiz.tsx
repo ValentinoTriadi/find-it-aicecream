@@ -1,13 +1,16 @@
 // src/pages/lesson/quiz.tsx
-import { useState } from 'react';
-import Confetti from 'react-confetti';
-import { useNavigate } from 'react-router-dom';
-import { useWindowSize } from 'react-use';
-import { toast } from 'sonner';
+import { useState } from "react";
+import Confetti from "react-confetti";
+import { useNavigate } from "react-router-dom";
+import { useWindowSize } from "react-use";
+import { toast } from "sonner";
 
-import { ChallengeCard } from './ChallengeCard';
-import { LessonFooter } from './LessonFooter';
-import { LessonHeader } from './LessonHeader';
+import { ChallengeCard } from "./ChallengeCard";
+import { LessonFooter } from "./LessonFooter";
+import { LessonHeader } from "./LessonHeader";
+import { markLessonComplete } from "@/api/learn";
+import { get } from "http";
+import { useUser } from "@/context/user.context";
 
 type QuizProps = {
   lesson: {
@@ -33,10 +36,10 @@ export const Quiz = ({
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(0);
   const [status, setStatus] = useState<
-    'correct' | 'wrong' | 'none' | 'completed'
-  >(isLessonCompleted ? 'completed' : 'none');
+    "correct" | "wrong" | "none" | "completed"
+  >(isLessonCompleted ? "completed" : "none");
   const [selectedOption, setSelectedOption] = useState<number | undefined>(
-    undefined,
+    undefined
   );
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -45,30 +48,37 @@ export const Quiz = ({
 
   const onSelect = (id: number) => {
     setSelectedOption(id);
-    setStatus('none');
+    setStatus("none");
   };
 
   const onContinue = () => {
     if (!challenge) return;
 
+    const { user } = useUser();
+
     const correctOption = options.find((option) => option.correct);
     if (correctOption?.id === selectedOption) {
-      setStatus('correct');
+      setStatus("correct");
       markChallengeComplete(challenge.id)
         .then(() => {
           if (activeIndex < lesson.challenges.length - 1) {
             setActiveIndex((prev) => prev + 1);
             setSelectedOption(undefined);
-            setStatus('none');
+            setStatus("none");
           } else {
-            setStatus('completed');
+            setStatus("completed");
             setShowConfetti(true);
+            if (user) {
+              markLessonComplete(user.id, lesson.id); // Tandai lesson selesai di DB
+            } else {
+              toast.error("User not found. Please log in again.");
+            }
           }
         })
-        .catch(() => toast.error('Something went wrong. Please try again.'));
+        .catch(() => toast.error("Something went wrong. Please try again."));
     } else {
-      setStatus('wrong');
-      toast.error('Incorrect answer. Try again.');
+      setStatus("wrong");
+      toast.error("Incorrect answer. Try again.");
     }
   };
 
@@ -88,7 +98,7 @@ export const Quiz = ({
           <h1 className="text-lg font-bold text-neutral-700 lg:text-3xl">
             Great job! <br /> You've completed the lesson.
           </h1>
-          <LessonFooter onCheck={() => navigate('/learn')} status="completed" />
+          <LessonFooter onCheck={() => navigate("/learn")} status="completed" />
         </div>
       </>
     );
@@ -105,7 +115,7 @@ export const Quiz = ({
               question={challenge.question}
               onSelect={onSelect}
               selectedOption={selectedOption}
-              disabled={status !== 'none'}
+              disabled={status !== "none"}
               status={status}
             />
           </div>

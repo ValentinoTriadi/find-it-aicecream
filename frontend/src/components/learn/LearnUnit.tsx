@@ -15,7 +15,7 @@ type UnitProps = {
   order: number;
   description: string;
   lessons: Lesson[];
-  userChallengeProgress: { challengeId: number; completed: boolean }[];
+  userLearnProgress: { lessonId: number; completed: boolean }[];
 };
 
 export const Unit = ({
@@ -23,13 +23,11 @@ export const Unit = ({
   title,
   description,
   lessons,
-  userChallengeProgress,
+  userLearnProgress,
 }: UnitProps) => {
-  // Set of completed challenge IDs
-  const completedChallengeIds = new Set(
-    userChallengeProgress
-      .filter((progress) => progress.completed)
-      .map((progress) => progress.challengeId)
+  // Set of completed lesson IDs
+  const completedLessonIds = new Set(
+    userLearnProgress.filter((p) => p.completed).map((p) => p.lessonId)
   );
 
   return (
@@ -40,14 +38,8 @@ export const Unit = ({
         {lessons.map((lesson, i) => {
           const isFirst = i === 0;
 
-          // Lesson dianggap selesai jika semua challenge selesai (kecuali VIDEO)
-          const isLessonCompleted =
-            lesson.lessonType === "VIDEO"
-              ? false // Atur sesuai progress video jika ada
-              : lesson.challenges.length > 0 &&
-                lesson.challenges.every((challenge) =>
-                  completedChallengeIds.has(challenge.id)
-                );
+          // Lesson dianggap selesai jika ada di completedLessonIds
+          const isLessonCompleted = completedLessonIds.has(lesson.id);
 
           // Lesson pertama: current jika belum selesai
           // Lesson lain: current jika belum selesai dan lesson sebelumnya sudah selesai
@@ -55,10 +47,7 @@ export const Unit = ({
             (!isLessonCompleted && isFirst) ||
             (!isLessonCompleted &&
               !isFirst &&
-              lessons[i - 1].lessonType !== "VIDEO" &&
-              lessons[i - 1].challenges.every((ch) =>
-                completedChallengeIds.has(ch.id)
-              ));
+              completedLessonIds.has(lessons[i - 1].id));
 
           // Lesson yang belum selesai dan bukan current = locked
           const isLocked = !isLessonCompleted && !isCurrent;
