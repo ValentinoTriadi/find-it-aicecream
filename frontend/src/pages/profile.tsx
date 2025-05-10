@@ -3,6 +3,7 @@ import LevelProgress from "@/components/profile/LevelProgress";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import StatsTab from "@/components/profile/StatsTab";
 import { useAuth } from "@/context/auth.context";
+import { useUser } from "@/context/user.context";
 import {
   Award,
   BarChart2,
@@ -71,6 +72,7 @@ const DummyAchievements = [
 ];
 const ProfilePage = () => {
   const auth = useAuth();
+  const profile = useUser();
   const [activeTab, setActiveTab] = useState<"Stats" | "Achievement">("Stats");
   const [userData, setUserData] = useState(DummyUserData);
   const [achievements, setAchievements] = useState(DummyAchievements);
@@ -80,29 +82,23 @@ const ProfilePage = () => {
         {/* Profile Header */}
         <ProfileHeader
           name={auth.user?.user_metadata?.nama}
-          joinDate={userData.joinDate}
+          joinDate={auth.user?.created_at ?? ""}
           achievementsUnlocked={userData.achievementsUnlocked}
-          exp={userData.exp}
+          exp={profile.experience ?? 0}
           handleLogout={() => auth.logout()}
         />
 
         {/* Level Progress */}
-        <LevelProgress
-          level={userData.level}
-          role={userData.role}
-          exp={userData.exp}
-          maxExp={userData.maxExp}
-          nextLevelExp={userData.nextLevelExp}
-        />
+        <LevelProgress exp={profile.experience ?? 0} />
 
         {/* Tabs */}
         <div className="mb-2">
-          <div className="inline-flex bg-card rounded-md p-1">
+          <div className="inline-flex bg-card rounded-md p-1 gap-1">
             {["Stats", "Achievement"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as "Stats" | "Achievement")}
-                className={`px-6 py-2 rounded-md ${
+                className={`px-6 py-2 rounded-[4px] ${
                   activeTab === tab
                     ? "bg-white text-[#0a3b56] font-medium"
                     : "text-[#0a3b56] hover:bg-white/50"

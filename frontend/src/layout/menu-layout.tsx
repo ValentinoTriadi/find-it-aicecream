@@ -1,8 +1,13 @@
-import AppSidebar from '@/components/app-sidebar';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { Outlet } from 'react-router-dom';
+import AppSidebar from "@/components/app-sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { useAuth } from "@/context/auth.context";
+import { Outlet } from "react-router-dom";
 
 const ProtectedMenuLayout = () => {
+  const auth = useAuth();
+  if (!auth.user) {
+    window.location.href = "/login";
+  }
   return (
     <SidebarProvider>
       <AppSidebar />

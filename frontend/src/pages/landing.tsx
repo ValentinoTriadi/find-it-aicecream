@@ -1,5 +1,6 @@
-import { WorkCard, WorkCardProps } from '@/components/landing/work-card';
-import { Button } from '@/components/ui/button';
+import { WorkCard, WorkCardProps } from "@/components/landing/work-card";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/auth.context";
 import {
   ArrowRight,
   BookOpen,
@@ -7,43 +8,45 @@ import {
   Globe,
   Swords,
   Trophy,
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
+} from "lucide-react";
+import { a } from "node_modules/framer-motion/dist/types.d-B50aGbjN";
+import { Link } from "react-router-dom";
 
 export const workCardData: WorkCardProps[] = [
   {
     step: 1,
-    title: 'Create an Account',
+    title: "Create an Account",
     description:
-      'Sign up and create your profile to start your language learning journey.',
+      "Sign up and create your profile to start your language learning journey.",
     features: [
-      'Master vocabulary and phrases for real-world situations',
-      'Master vocabulary and phrases for real-world situations',
+      "Master vocabulary and phrases for real-world situations",
+      "Master vocabulary and phrases for real-world situations",
     ],
   },
   {
     step: 2,
-    title: 'Learn Basics',
+    title: "Learn Basics",
     description:
-      'Complete introductory lessons to build your foundation in English.',
+      "Complete introductory lessons to build your foundation in English.",
     features: [
-      'Topic-based vocabulary and phrases',
-      'Interactive learning materials',
+      "Topic-based vocabulary and phrases",
+      "Interactive learning materials",
     ],
   },
   {
     step: 3,
-    title: 'Start Battling',
+    title: "Start Battling",
     description:
-      'Challenge other learners to battles and improve your skills through practice.',
+      "Challenge other learners to battles and improve your skills through practice.",
     features: [
-      'Real-time conversation practice',
-      'Instant feedback on your performance',
+      "Real-time conversation practice",
+      "Instant feedback on your performance",
     ],
   },
 ];
 
 export default function LandingPage() {
+  const auth = useAuth();
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -55,21 +58,32 @@ export default function LandingPage() {
             className="h-12 py-2"
           />
 
-          <div className="flex items-center gap-3">
-            <Link to="/login">
-              <Button
-                variant="outline"
-                className="bg-transparent border-white text-white hover:bg-white/10 hover:text-white"
-              >
-                Login
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button className="bg-stronger-blue hover:bg-more-stronger-blue text-white">
-                Register
-              </Button>
-            </Link>
-          </div>
+          {auth.user ? (
+            <div className="flex items-center gap-3">
+              <Link to="/profile">
+                <Button className="bg-stronger-blue hover:bg-more-stronger-blue text-white">
+                  Continue
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link to="/login">
+                <Button
+                  variant="outline"
+                  className="bg-transparent border-white text-white hover:bg-white/10 hover:text-white"
+                >
+                  Login
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button className="bg-stronger-blue hover:bg-more-stronger-blue text-white">
+                  Register
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </header>
 
@@ -81,7 +95,7 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row items-start gap-12">
               <div className="md:w-1/2">
                 <h1 className="text-4xl md:text-5xl font-bold text-dark-blue mb-4">
-                  Master English by{' '}
+                  Master English by{" "}
                   <span className="text-stronger-blue">Battling</span> with
                   Others
                 </h1>
@@ -89,7 +103,7 @@ export default function LandingPage() {
                   Improve your English skills through fun, interactive battles
                   with other learners.
                 </p>
-                <Link to="/register">
+                <Link to={auth.user ? "/profile" : "/register"}>
                   <Button
                     size="lg"
                     className="bg-stronger-blue hover:bg-more-stronger-blue text-white"
@@ -160,11 +174,13 @@ export default function LandingPage() {
                       </div>
                     </div>
 
-                    <Link to="/register">
-                      <Button className="w-full bg-stronger-blue hover:bg-more-stronger-blue text-white">
-                        Create New Account
-                      </Button>
-                    </Link>
+                    {!auth.user && (
+                      <Link to="/register">
+                        <Button className="w-full bg-stronger-blue hover:bg-more-stronger-blue text-white">
+                          Create New Account
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
@@ -208,7 +224,7 @@ export default function LandingPage() {
               through BattleTalk's interactive platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/register">
+              <Link to={auth.user ? "/profile" : "/register"}>
                 <Button
                   size="lg"
                   className="bg-white text-dark-blue hover:bg-gray-100"
@@ -216,15 +232,17 @@ export default function LandingPage() {
                   Get Started Now
                 </Button>
               </Link>
-              <Link to="/login">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-transparent border-white text-white hover:bg-white/10 hover:text-white"
-                >
-                  I Already Have an Account
-                </Button>
-              </Link>
+              {!auth.user && (
+                <Link to="/login">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="bg-transparent border-white text-white hover:bg-white/10 hover:text-white"
+                  >
+                    I Already Have an Account
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </section>

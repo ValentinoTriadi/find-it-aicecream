@@ -19,13 +19,13 @@ export async function signUpNewUser({ email, password, name }: RegisterBody) {
 
   // Update user profile name
   const res = await supabase
-    .from("user")
+    .from("users")
     .update({ nama: name })
     .eq("id", data.user?.id);
 
   if (res.error) {
-    console.log("Update profile error:", res);
-    throw new Error(res.error?.message);
+    console.log("Update profile error:", res.error);
+    throw new Error(res.error.message);
   }
 
   console.log("User signed up:", data);

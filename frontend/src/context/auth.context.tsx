@@ -71,11 +71,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async () => {
-    setUser(null);
-
-    await signOut();
-
-    navigate("/login");
+    try {
+      await signOut();
+      setUser(null);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      return;
+    }
   };
 
   return (

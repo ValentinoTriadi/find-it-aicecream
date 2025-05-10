@@ -12,13 +12,16 @@ import { AuthProvider } from './context/auth.context.tsx';
 import './index.css';
 import { store } from './redux';
 import theme from './theme';
+import { UserProvider } from './context/user.context.tsx';
 
 ReactDOM.createRoot(document.querySelector('#root')!).render(
   <BrowserRouter>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <AuthProvider>
-          <App />
+          <UserProvider>
+            <App />
+          </UserProvider>
         </AuthProvider>
       </ThemeProvider>
     </Provider>
