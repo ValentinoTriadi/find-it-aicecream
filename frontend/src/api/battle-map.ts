@@ -1,8 +1,8 @@
-import { TopicCategory } from '@/context/battle-map.context';
-import supabase from '@/utils/supabase';
+import { TopicCategory } from "@/context/battle-map.context";
+import supabase from "@/utils/supabase";
 
 export async function getAllTopic() {
-  const { data, error } = await supabase.from('topic').select('*');
+  const { data, error } = await supabase.from("topic").select("*");
 
   if (error) {
     throw new Error(error.message);
@@ -12,9 +12,9 @@ export async function getAllTopic() {
 }
 export async function getTopicById(id: number) {
   const { data, error } = await supabase
-    .from('topic')
-    .select('*')
-    .eq('id', id)
+    .from("topic")
+    .select("*")
+    .eq("id", id)
     .single();
 
   if (error) {
@@ -25,9 +25,9 @@ export async function getTopicById(id: number) {
 }
 export async function getAllSubTopic(topicId: number) {
   const { data, error } = await supabase
-    .from('sub_topic')
-    .select('*')
-    .eq('topic_id', topicId);
+    .from("sub_topic")
+    .select("*")
+    .eq("topic_id", topicId);
 
   if (error) {
     throw new Error(error.message);
@@ -37,9 +37,9 @@ export async function getAllSubTopic(topicId: number) {
 }
 export async function getSubTopicById(id: number) {
   const { data, error } = await supabase
-    .from('sub_topic')
-    .select('*')
-    .eq('id', id)
+    .from("sub_topic")
+    .select("*")
+    .eq("id", id)
     .single();
 
   if (error) {
@@ -50,9 +50,9 @@ export async function getSubTopicById(id: number) {
 }
 export async function getAllSubTopicWithStar(topicId: number) {
   const { data, error } = await supabase
-    .from('sub_topic')
-    .select('*, sub_topic_star(*)')
-    .eq('topic_id', topicId);
+    .from("sub_topic")
+    .select("*, sub_topic_star(*)")
+    .eq("topic_id", topicId);
 
   if (error) {
     throw new Error(error.message);
@@ -63,9 +63,9 @@ export async function getAllSubTopicWithStar(topicId: number) {
 
 export async function getTopicStarCount(topicId: number) {
   const { data, error } = await supabase
-    .from('topic')
-    .select('*, sub_topic(*, sub_topic_star(*))')
-    .eq('id', topicId);
+    .from("topic")
+    .select("*, sub_topic(*, sub_topic_star(*))")
+    .eq("id", topicId);
 
   if (error) {
     throw new Error(error.message);
@@ -80,7 +80,7 @@ export async function getTopicStarCount(topicId: number) {
         }
         return acc1;
       },
-      0,
+      0
     );
     return acc + subTopicStar;
   }, 0);
@@ -89,13 +89,13 @@ export async function getTopicStarCount(topicId: number) {
 }
 export async function getAllSubTopicWithStarByUserId(
   topicId: number,
-  userId: string,
+  userId: string
 ) {
   const { data, error } = await supabase
-    .from('sub_topic')
-    .select('*, sub_topic_star(*)')
-    .eq('topic_id', topicId)
-    .filter('sub_topic_star.user_id', 'eq', userId);
+    .from("sub_topic")
+    .select("*, sub_topic_star(*)")
+    .eq("topic_id", topicId)
+    .filter("sub_topic_star.user_id", "eq", userId);
 
   if (error) {
     throw new Error(error.message);
@@ -105,9 +105,9 @@ export async function getAllSubTopicWithStarByUserId(
 }
 export async function getCountStarUser(userId: string) {
   const { data, error } = await supabase
-    .from('sub_topic_star')
-    .select('*', { count: 'exact' })
-    .eq('user_id', userId);
+    .from("sub_topic_star")
+    .select("*", { count: "exact" })
+    .eq("user_id", userId);
 
   if (error) {
     throw new Error(error.message);
@@ -124,9 +124,9 @@ export async function getCountStarUser(userId: string) {
 }
 export async function getVictoryUser(userId: string) {
   const { data, error } = await supabase
-    .from('sub_topic_star')
-    .select('*', { count: 'exact' })
-    .eq('user_id', userId);
+    .from("sub_topic_star")
+    .select("*", { count: "exact" })
+    .eq("user_id", userId);
 
   if (error) {
     throw new Error(error.message);
@@ -149,16 +149,16 @@ export async function getVictoryUser(userId: string) {
  */
 export async function getLastSubTopicDone(topicId: number, userId: string) {
   const { data, error } = await supabase
-    .from('sub_topic_star')
-    .select('sub_topic_id')
-    .eq('user_id', userId)
+    .from("sub_topic_star")
+    .select("sub_topic_id")
+    .eq("user_id", userId)
     .in(
-      'sub_topic_id',
+      "sub_topic_id",
       (
-        await supabase.from('sub_topic').select('id').eq('topic_id', topicId)
-      ).data?.map((subTopic) => subTopic.id) || [],
+        await supabase.from("sub_topic").select("id").eq("topic_id", topicId)
+      ).data?.map((subTopic) => subTopic.id) || []
     )
-    .order('sub_topic_id', { ascending: false })
+    .order("sub_topic_id", { ascending: false })
     .limit(1);
 
   if (error) {
@@ -170,8 +170,8 @@ export async function getLastSubTopicDone(topicId: number, userId: string) {
 
 export async function getAllTopicWithSubTopicAndStar() {
   const { data, error } = await supabase
-    .from('topic')
-    .select('*, sub_topic(*, sub_topic_star(*))');
+    .from("topic")
+    .select("*, sub_topic(*, sub_topic_star(*))");
 
   if (error) {
     throw new Error(error.message);
@@ -185,17 +185,17 @@ export async function getAllTopicWithSubTopicAndStar() {
       return {
         id: subTopic.id,
         name: subTopic.name,
-        level: topidx + 1 + '-' + (subidx + 1),
+        level: topidx + 1 + "-" + (subidx + 1),
         description: subTopic.description,
         points: 50,
         stars: subTopicStar,
-        unlocked: subidx == 0 ? true : false,
+        unlocked: true,
         battleWon: 0,
         averageTime: 0,
         bestScore: 0,
         roles: [
-          { name: 'Leader', desc: 'Gives instructions to teammates' },
-          { name: 'Follower', desc: 'Executes tasks based on given orders' },
+          { name: "Leader", desc: "Gives instructions to teammates" },
+          { name: "Follower", desc: "Executes tasks based on given orders" },
         ],
         topic_id: topic.id,
       };
@@ -203,14 +203,14 @@ export async function getAllTopicWithSubTopicAndStar() {
     return {
       id: topic.id,
       name: topic.name,
-      icon: '',
-      color: '',
-      bgColor: '',
+      icon: "",
+      color: "",
+      bgColor: "",
       subtopic: subTopics,
     };
   });
 
-  console.log('NEW DATA: ', newData);
+  console.log("NEW DATA: ", newData);
 
   return newData as TopicCategory[];
 }

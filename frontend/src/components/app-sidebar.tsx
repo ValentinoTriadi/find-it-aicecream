@@ -116,7 +116,7 @@ const SidebarItem = ({ linkTo, icon, label }: SidebarItemProps) => {
     <Link
       to={linkTo}
       className={`flex items-center gap-3 p-3 rounded-md transition-colors ${
-        isActive(linkTo) ? 'bg-white/50 text-dark-blue' : 'hover:bg-[#2A5A7C]'
+        isActive(linkTo) ? 'bg-white/50' : 'hover:bg-[#2A5A7C]'
       }`}
     >
       {icon}

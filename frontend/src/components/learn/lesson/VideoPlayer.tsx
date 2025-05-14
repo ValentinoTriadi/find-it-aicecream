@@ -60,8 +60,8 @@ export const VideoPlayer = ({
           <h1 className="text-lg font-bold text-neutral-700 lg:text-3xl">
             Great job! <br /> You've completed the lesson.
           </h1>
+          <LessonFooter onCheck={() => navigate("/learn")} status="completed" />
         </div>
-        <LessonFooter onCheck={onContinue} status="completed" />
       </>
     );
   }
