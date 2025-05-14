@@ -1,4 +1,5 @@
 import { fetchAllAchievements, fetchUserAchievements } from '@/api/achievement';
+import SimpleLoading from '@/components/loading';
 import { useAuth } from '@/context/auth.context';
 import {
   Award,
@@ -9,7 +10,6 @@ import {
   Trophy,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
 
 interface Achievement {
   id: number;
@@ -71,7 +71,7 @@ export default function AchievementsPage() {
   const completedCount = allAchievements.filter((a) => a.completed).length;
 
   if (loading) {
-    return <div className="p-8 text-center">Loading achievements...</div>;
+    return <SimpleLoading />;
   }
 
   return (

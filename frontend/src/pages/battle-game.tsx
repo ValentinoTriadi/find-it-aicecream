@@ -1,30 +1,30 @@
-"use client";
+'use client';
 
-import EnemyTimerBar from "@/components/battle/EnemyTimeBar";
-import MicController from "@/components/battle/MicController";
-import PausePopup from "@/components/battle/PausePopup";
-import ScriptHint from "@/components/battle/ScriptHint";
-import TimerCircle from "@/components/battle/TimerCircle";
-import BattlePopup from "@/components/battle/result/BattlePopup";
-import { Card } from "@/components/ui/card";
-import { useBattle } from "@/hooks/useBattle";
-import { useScriptHintManager } from "@/hooks/useScriptHintManager";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Info, Pause } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Badge } from "@mui/material";
+import EnemyTimerBar from '@/components/battle/EnemyTimeBar';
+import MicController from '@/components/battle/MicController';
+import PausePopup from '@/components/battle/PausePopup';
+import ScriptHint from '@/components/battle/ScriptHint';
+import TimerCircle from '@/components/battle/TimerCircle';
+import BattlePopup from '@/components/battle/result/BattlePopup';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { useBattle } from '@/hooks/useBattle';
+import { useScriptHintManager } from '@/hooks/useScriptHintManager';
+import { cn } from '@/lib/utils';
+import { Badge } from '@mui/material';
+import { Info, Pause } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const TOTAL_ROUNDS = 10;
 const SCRIPT_HINT_DELAY = 7000;
 const MUTE_LIMIT = 4;
 
 const staticTopicMap: Record<string, string> = {
-  "1": "As a waiter, you try to offer some menu",
-  "2": "Booking a Hotel",
-  "3": "Job Interview",
-  "4": "Giving Directions",
+  '1': 'As a waiter, you try to offer some menu',
+  '2': 'Booking a Hotel',
+  '3': 'Job Interview',
+  '4': 'Giving Directions',
 };
 
 export default function BattleGame() {
@@ -33,7 +33,7 @@ export default function BattleGame() {
     topicId: string;
     subtopicId: string;
   }>();
-  const topicName = staticTopicMap[subtopicId ?? ""] ?? "Unknown Topic";
+  const topicName = staticTopicMap[subtopicId ?? ''] ?? 'Unknown Topic';
 
   const [scriptHintVisible, setScriptHintVisible] = useState(false);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
@@ -43,15 +43,13 @@ export default function BattleGame() {
     round,
     isMyTurn,
     progress,
-    micStarted,
+
     micError,
     listening,
     transcript,
-    setMicStarted,
     handleMicClick,
     handleSubmit,
     checkGameOver,
-    conversation,
   } = useBattle({
     totalRounds: TOTAL_ROUNDS,
     muteLimit: MUTE_LIMIT,
@@ -59,7 +57,7 @@ export default function BattleGame() {
   });
 
   useScriptHintManager({
-    currentPlayer: isMyTurn() ? "player" : "enemy",
+    currentPlayer: isMyTurn() ? 'player' : 'enemy',
     delay: SCRIPT_HINT_DELAY,
     onTrigger: () => {
       if (isMyTurn()) {
@@ -165,8 +163,8 @@ export default function BattleGame() {
         {/* Enemy Side */}
         <div
           className={cn(
-            "flex flex-col pt-12  h-full justify-end",
-            isMyTurn() && "opacity-60"
+            'flex flex-col pt-12  h-full justify-end',
+            isMyTurn() && 'opacity-60',
           )}
         >
           {!isMyTurn() && (
@@ -185,7 +183,7 @@ export default function BattleGame() {
           topicName={topicName}
           onResume={() => setShowPausePopup(false)}
           onRestart={() => window.location.reload()}
-          onExit={() => (window.location.href = "/battle-map")}
+          onExit={() => (window.location.href = '/battle-map')}
         />
       )}
 
@@ -193,7 +191,7 @@ export default function BattleGame() {
         <BattlePopup
           round={round}
           topicName={topicName}
-          onContinue={() => (window.location.href = "/battle-map")}
+          onContinue={() => (window.location.href = '/battle-map')}
           onRetry={() => window.location.reload()}
         />
       )}

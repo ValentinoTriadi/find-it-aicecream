@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { Unit } from "@/components/learn/LearnUnit";
-import { learnUnits as initialLearnUnits } from "@/utils/data-learn";
 import { fetchUserLearn } from "@/api/learn";
+import { Unit } from "@/components/learn/LearnUnit";
+import SimpleLoading from "@/components/loading";
 import { useAuth } from "@/context/auth.context";
+import { learnUnits as initialLearnUnits } from "@/utils/data-learn";
+import { useEffect, useState } from "react";
 
 export default function LearnPage() {
   const { user } = useAuth();
@@ -29,7 +30,7 @@ export default function LearnPage() {
   }, [user]);
 
   if (loading) {
-    return <div className="p-8 text-center">Loading your progress...</div>;
+    return <SimpleLoading />;
   }
 
   return (
