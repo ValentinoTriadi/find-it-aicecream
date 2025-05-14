@@ -7,7 +7,7 @@ const LoginPage = () => {
   const auth = useAuth();
 
   const params = new URLSearchParams(window.location.search);
-  const redirect = params.get("redirect");
+  const redirect = params.get("redirect") || undefined;
 
   if (auth.user) {
     window.location.href = redirect || "/";
