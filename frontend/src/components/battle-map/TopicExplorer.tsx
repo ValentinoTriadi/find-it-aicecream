@@ -1,16 +1,20 @@
-'use client';
+"use client";
 
-import type { Topic } from '@/constant';
-import { TopicCategory } from '@/context/battle-map.context';
-import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle, Star, Trophy, Zap } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import type { Topic } from "@/constant";
+import {
+  TopicCategory,
+  useBattleMapSubtopic,
+} from "@/context/battle-map.context";
+import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircle, Star, Trophy, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const CATEGORY_POSITIONS = [
-  { top: '30%', left: '25%' },
-  { top: '30%', left: '75%' },
-  { top: '60%', left: '30%' },
-  { top: '60%', left: '70%' },
+  { top: "15%", left: "50%" }, // top center
+  { top: "40%", left: "15%" }, // mid-left
+  { top: "40%", left: "85%" }, // mid-right
+  { top: "75%", left: "25%" }, // bottom-left
+  { top: "75%", left: "75%" }, // bottom-right
 ];
 
 interface TopicProps {
@@ -24,6 +28,7 @@ export const TopicExplorer = ({
   selectedTopic,
   handleSelectTopic,
 }: TopicProps) => {
+  const { subtopicStars } = useBattleMapSubtopic();
   const [hoveredTopic, setHoveredTopic] = useState<number | null>(null);
   const [showParticles, setShowParticles] = useState(false);
 
@@ -35,7 +40,7 @@ export const TopicExplorer = ({
   }, [selectedTopic.id]);
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-blue-100 shadow-md rounded-xl p-8 mb-8 h-[400px] relative overflow-hidden">
+    <div className="bg-gradient-to-br from-blue-50 to-blue-100 shadow-md rounded-xl p-8 mb-8 h-[600px] relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden opacity-20">
         {[...Array(20)].map((_, i) => (
@@ -58,62 +63,23 @@ export const TopicExplorer = ({
         className="absolute inset-0 w-full h-full z-0"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <line
-          x1="25%"
-          y1="30%"
-          x2="50%"
-          y2="50%"
-          stroke="#93c5fd"
-          strokeWidth="2"
-          strokeDasharray="5,5"
-          className={
-            selectedTopic.id === availableTopics[0].id
-              ? 'opacity-70'
-              : 'opacity-30'
-          }
-        />
-        <line
-          x1="75%"
-          y1="30%"
-          x2="50%"
-          y2="50%"
-          stroke="#93c5fd"
-          strokeWidth="2"
-          strokeDasharray="5,5"
-          className={
-            selectedTopic.id === availableTopics[1].id
-              ? 'opacity-70'
-              : 'opacity-30'
-          }
-        />
-        <line
-          x1="30%"
-          y1="60%"
-          x2="50%"
-          y2="50%"
-          stroke="#93c5fd"
-          strokeWidth="2"
-          strokeDasharray="5,5"
-          className={
-            selectedTopic.id === availableTopics[2].id
-              ? 'opacity-70'
-              : 'opacity-30'
-          }
-        />
-        <line
-          x1="70%"
-          y1="60%"
-          x2="50%"
-          y2="50%"
-          stroke="#93c5fd"
-          strokeWidth="2"
-          strokeDasharray="5,5"
-          className={
-            selectedTopic.id === availableTopics[3].id
-              ? 'opacity-70'
-              : 'opacity-30'
-          }
-        />
+        {CATEGORY_POSITIONS.map((pos, idx) => (
+          <line
+            key={idx}
+            x1={pos.left}
+            y1={pos.top}
+            x2="50%"
+            y2="50%"
+            stroke="#93c5fd"
+            strokeWidth="2"
+            strokeDasharray="5,5"
+            className={
+              selectedTopic.id === availableTopics[idx]?.id
+                ? "opacity-70"
+                : "opacity-30"
+            }
+          />
+        ))}
       </svg>
 
       {/* Center decoration */}
@@ -124,7 +90,7 @@ export const TopicExplorer = ({
         const isSelected = category.id === selectedTopic.id;
         const isHovered = category.id === hoveredTopic;
         const position = isSelected
-          ? { top: '50%', left: '50%' }
+          ? { top: "50%", left: "50%" }
           : CATEGORY_POSITIONS[index];
 
         return (
@@ -133,15 +99,15 @@ export const TopicExplorer = ({
             className="absolute cursor-pointer flex flex-col items-center z-10"
             initial={{
               ...CATEGORY_POSITIONS[index],
-              transform: 'translate(-50%, -50%)',
+              transform: "translate(-50%, -50%)",
             }}
             animate={{
               ...position,
-              transform: 'translate(-50%, -50%)',
+              transform: "translate(-50%, -50%)",
               scale: isSelected ? 1.2 : isHovered ? 1.1 : 1,
               zIndex: isSelected ? 10 : 1,
             }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
             onClick={() => handleSelectTopic(category.id)}
             onMouseEnter={() => setHoveredTopic(category.id)}
             onMouseLeave={() => setHoveredTopic(null)}
@@ -160,8 +126,8 @@ export const TopicExplorer = ({
 
               <motion.div
                 className={`w-16 h-16 rounded-full flex items-center justify-center shadow-md relative
-                  ${isSelected ? 'ring-4 ring-blue-300' : ''}
-                  ${isHovered && !isSelected ? 'ring-2 ring-blue-200' : ''}
+                  ${isSelected ? "ring-4 ring-blue-300" : ""}
+                  ${isHovered && !isSelected ? "ring-2 ring-blue-200" : ""}
                 `}
                 style={{ backgroundColor: category.bgColor }}
                 whileHover={{ scale: 1.05 }}
@@ -174,7 +140,7 @@ export const TopicExplorer = ({
                   <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
                     <div className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full flex items-center">
                       <Star className="w-3 h-3 mr-1 text-yellow-300" />
-                      {index + 1}
+                      {subtopicStars?.[selectedTopic.id] ?? 0}
                     </div>
                   </div>
                 )}
@@ -198,7 +164,7 @@ export const TopicExplorer = ({
                         }}
                         transition={{
                           duration: 1 + Math.random(),
-                          ease: 'easeOut',
+                          ease: "easeOut",
                         }}
                       />
                     ))}
@@ -212,7 +178,7 @@ export const TopicExplorer = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 4 }}
                   className="mt-2 font-semibold text-center"
-                  style={{ color: isSelected ? '#1e40af' : category.color }}
+                  style={{ color: isSelected ? "#1e40af" : category.color }}
                 >
                   {category.name}
 
@@ -220,7 +186,7 @@ export const TopicExplorer = ({
                   {(isSelected || isHovered) && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
+                      animate={{ opacity: 1, height: "auto" }}
                       className="text-xs text-blue-600 mt-1"
                     >
                       <div className="flex items-center justify-center gap-1">
@@ -253,11 +219,12 @@ export const TopicExplorer = ({
 
           <div className="flex justify-center gap-3 text-xs">
             <div className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex items-center">
-              <Trophy className="w-3 h-3 mr-1" />5 Levels
+              <Trophy className="w-3 h-3 mr-1" />
+              {selectedTopic.subtopic.length} Levels
             </div>
             <div className="bg-green-100 text-yellow-700 px-2 py-1 rounded-full flex items-center">
               <Star className="w-3 h-3 mr-1" />
-              15 Stars
+              {subtopicStars?.[selectedTopic.id] ?? 0} Stars
             </div>
           </div>
         </motion.div>

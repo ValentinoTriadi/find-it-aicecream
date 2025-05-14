@@ -1,4 +1,5 @@
 import { fetchAllAchievements, fetchUserAchievements } from '@/api/achievement';
+import SimpleLoading from '@/components/loading';
 import AchievementTab from '@/components/profile/AchievementTab';
 import LevelProgress from '@/components/profile/LevelProgress';
 import ProfileHeader from '@/components/profile/ProfileHeader';
@@ -114,7 +115,7 @@ const ProfilePage = () => {
 
           {activeTab === 'Achievement' &&
             (loading ? (
-              <div className="p-8 text-center">Loading achievements...</div>
+              <SimpleLoading />
             ) : (
               <AchievementTab
                 unlocked={userData.achievementsUnlocked}

@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Quiz } from "@/components/learn/lesson/Quiz";
-import { VideoPlayer } from "@/components/learn/lesson/VideoPlayer";
-import { Button } from "@mui/material";
-import { ArrowLeft } from "lucide-react";
-import { lessons } from "@/utils/data-lesson";
-import { useAuth } from "@/context/auth.context";
-import { fetchUserLearn, markLessonComplete } from "@/api/learn";
+import { fetchUserLearn, markLessonComplete } from '@/api/learn';
+import { Quiz } from '@/components/learn/lesson/Quiz';
+import { VideoPlayer } from '@/components/learn/lesson/VideoPlayer';
+import SimpleLoading from '@/components/loading';
+import { useAuth } from '@/context/auth.context';
+import { lessons } from '@/utils/data-lesson';
+import { Button } from '@mui/material';
+import { ArrowLeft } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export default function LessonPage() {
   const { id } = useParams();
@@ -14,7 +15,7 @@ export default function LessonPage() {
   const { user } = useAuth();
 
   const [lesson, setLesson] = useState(
-    lessons.find((l) => l.id === Number(id))
+    lessons.find((l) => l.id === Number(id)),
   );
   const [lessonCompleted, setLessonCompleted] = useState(false);
   const [challengeStatus, setChallengeStatus] = useState<{
@@ -32,7 +33,7 @@ export default function LessonPage() {
         setLessonCompleted(!!found?.completed);
 
         // Jika lesson quiz, inisialisasi challengeStatus dari DB jika ingin (atau kosong)
-        if (lesson.lessonType === "QUIZ") {
+        if (lesson.lessonType === 'QUIZ') {
           // Inisialisasi semua challenge belum selesai
           const status: { [id: number]: boolean } = {};
           lesson.challenges.forEach((ch) => {
@@ -51,9 +52,9 @@ export default function LessonPage() {
           <p className="text-xl">Lesson not found.</p>
           <Button
             className="text-stronger-blue flex gap-2"
-            onClick={() => navigate("/learn")}
+            onClick={() => navigate('/learn')}
           >
-            <ArrowLeft className="text-stronger-blue" />{" "}
+            <ArrowLeft className="text-stronger-blue" />{' '}
             <span className="text-stronger-blue">Back to Learn</span>
           </Button>
         </div>
@@ -79,12 +80,12 @@ export default function LessonPage() {
   };
 
   if (loading) {
-    return <div className="p-8 text-center">Loading lesson...</div>;
+    return <SimpleLoading />;
   }
 
   return (
     <>
-      {lesson.lessonType === "QUIZ" ? (
+      {lesson.lessonType === 'QUIZ' ? (
         <Quiz
           lesson={{
             ...lesson,

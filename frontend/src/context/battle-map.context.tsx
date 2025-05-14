@@ -1,9 +1,11 @@
 import {
   getAllSubTopic,
   getAllTopic,
+  getAllTopicWithSubTopicAndStar,
   getCountStarUser,
+  getTopicStarCount,
 } from '@/api/battle-map';
-import { Globe, Plane, ShoppingBag, Utensils } from 'lucide-react';
+import { Globe, Hotel, Plane, ShoppingBag, Utensils } from 'lucide-react';
 import React, {
   ReactNode,
   createContext,
@@ -46,6 +48,7 @@ export interface TopicCategory {
 interface BattleMapSubtopicContextType {
   topicCategories: TopicCategory[];
   userStars: number;
+  subtopicStars: Record<number, number> | undefined;
   loading: boolean;
   refresh: () => void;
 }
@@ -55,17 +58,19 @@ const BattleMapSubtopicContext = createContext<
 >(undefined);
 
 const ICON_MAP: Record<string, React.ReactNode> = {
-  travel: <Plane className="text-white w-8 h-8" />,
-  restaurants: <Utensils className="text-white w-8 h-8" />,
-  shopping: <ShoppingBag className="text-white w-8 h-8" />,
-  essentials: <Globe className="text-white w-8 h-8" />,
+  airport: <Plane className="text-white w-8 h-8" />,
+  restaurant: <Utensils className="text-white w-8 h-8" />,
+  supermarket: <ShoppingBag className="text-white w-8 h-8" />,
+  publictransport: <Globe className="text-white w-8 h-8" />,
+  hotel: <Hotel className="text-white w-8 h-8" />,
 };
 
 const COLOR_MAP: Record<string, string> = {
-  travel: '#5cb176',
-  restaurants: '#ffc83d',
-  shopping: '#ef5261',
-  essentials: '#87ceeb',
+  airport: '#5cb176',
+  restaurant: '#ffc83d',
+  supermarket: '#ef5261',
+  publictransport: '#87ceeb',
+  hotel: '#f7ebfe',
 };
 
 export const BattleMapSubtopicProvider = ({
@@ -74,7 +79,8 @@ export const BattleMapSubtopicProvider = ({
   children: ReactNode;
 }) => {
   const [topicCategories, setTopicCategories] = useState<TopicCategory[]>([]);
-  const [userStars, setUserStars] = useState<number>(0);
+  const [userStars, setUserStars] = useState<number>(-1);
+  const [subtopicStars, setSubtopicStars] = useState<Record<number, number>>();
 
   const [loading, setLoading] = useState(true);
 
@@ -85,30 +91,41 @@ export const BattleMapSubtopicProvider = ({
       if (!profile || !profile.user) {
         return;
       }
-      const topics = await getAllTopic();
+      // const topics = await getAllTopic();
       const star = await getCountStarUser(profile.user.id ?? 0);
       setUserStars(star);
       // Fetch all subtopics for all topics
-      const subtopicPromises = topics.map((topic: any) =>
-        getAllSubTopic(topic.id),
-      );
-      const subtopicResults = await Promise.all(subtopicPromises);
+      // const subtopicPromises = topics.map((topic: any) =>
+      //   getAllSubTopic(topic.id)
+      // );
+      // const subtopicResults = await Promise.all(subtopicPromises);
+
+      const topics = await getAllTopicWithSubTopicAndStar();
 
       // Map topics to TopicCategory structure
-      const categories: TopicCategory[] = topics.map(
-        (topic: any, idx: number) => {
+      const categories = await Promise.all(
+        topics.map(async (topic: TopicCategory, idx: number) => {
           // Use topic.name (lowercase, no space) as key for icon/color, fallback if not found
+
           const key = topic.name.toLowerCase().replace(/\s/g, '');
+          const topicStar = await getTopicStarCount(topic.id);
+
+          setSubtopicStars((prev) => ({
+            ...prev, // keep all previous entries
+            [topic.id]: topicStar, // overwrite (or add) this one
+          }));
+
           return {
             id: topic.id,
             name: topic.name,
             icon: ICON_MAP[key] || <Plane className="text-white w-8 h-8" />,
             color: COLOR_MAP[key] || '#5cb176',
             bgColor: COLOR_MAP[key] || '#5cb176',
-            subtopic: subtopicResults[idx] || [],
+            subtopic: topic.subtopic,
           };
-        },
+        }),
       );
+      console.log('Stars: ', subtopicStars);
 
       setUserStars(userStars);
 
@@ -126,7 +143,13 @@ export const BattleMapSubtopicProvider = ({
 
   return (
     <BattleMapSubtopicContext.Provider
-      value={{ topicCategories, userStars, loading, refresh: fetchAll }}
+      value={{
+        topicCategories,
+        userStars,
+        subtopicStars,
+        loading,
+        refresh: fetchAll,
+      }}
     >
       {children}
     </BattleMapSubtopicContext.Provider>

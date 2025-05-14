@@ -60,6 +60,33 @@ export async function getAllSubTopicWithStar(topicId: number) {
 
   return data;
 }
+
+export async function getTopicStarCount(topicId: number) {
+  const { data, error } = await supabase
+    .from("topic")
+    .select("*, sub_topic(*, sub_topic_star(*))")
+    .eq("id", topicId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const subTopics = data[0].sub_topic;
+  const starCount = subTopics.reduce((acc: number, curr: any) => {
+    const subTopicStar = curr.sub_topic_star.reduce(
+      (acc1: number, curr: any) => {
+        if (curr.star) {
+          acc1 += curr.star;
+        }
+        return acc1;
+      },
+      0
+    );
+    return acc + subTopicStar;
+  }, 0);
+
+  return starCount as number;
+}
 export async function getAllSubTopicWithStarByUserId(
   topicId: number,
   userId: string

@@ -1,11 +1,12 @@
-import { fetchCurrentUser, fetchLeaderboard } from "@/api/leaderboard";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/context/auth.context";
-import { Crown, Medal, Trophy } from "lucide-react";
-import { useEffect, useState } from "react";
+import { fetchCurrentUser, fetchLeaderboard } from '@/api/leaderboard';
+import SimpleLoading from '@/components/loading';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/context/auth.context';
+import { Crown, Medal, Trophy } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-import { cn } from "../lib/utils";
+import { cn } from '../lib/utils';
 
 // Configuration
 const TOP_X = 10;
@@ -38,14 +39,14 @@ export default function LeaderboardPage() {
       ...user,
       badge:
         index === 0
-          ? "gold"
+          ? 'gold'
           : index === 1
-          ? "silver"
-          : index === 2
-          ? "bronze"
-          : undefined,
+            ? 'silver'
+            : index === 2
+              ? 'bronze'
+              : undefined,
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        user.nama
+        user.nama,
       )}&background=random&size=${AVATAR_HEIGHT}`,
     }));
 
@@ -62,32 +63,32 @@ export default function LeaderboardPage() {
     ? {
         ...currentUserData,
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-          currentUserData.nama
+          currentUserData.nama,
         )}&background=random&size=${AVATAR_HEIGHT}`,
         badge:
           currentUserRank <= 3
             ? currentUserRank === 1
-              ? "gold"
+              ? 'gold'
               : currentUserRank === 2
-              ? "silver"
-              : "bronze"
+                ? 'silver'
+                : 'bronze'
             : undefined,
       }
     : null;
 
   if (loading) {
-    return <div className="p-8 text-center">Loading leaderboard...</div>;
+    return <SimpleLoading />;
   }
   const getAvatarColor = (initials: string) => {
     const colors = [
-      "bg-blue-500",
-      "bg-green-500",
-      "bg-purple-600",
-      "bg-yellow-500",
-      "bg-pink-500",
-      "bg-indigo-500",
-      "bg-red-500",
-      "bg-teal-500",
+      'bg-blue-500',
+      'bg-green-500',
+      'bg-purple-600',
+      'bg-yellow-500',
+      'bg-pink-500',
+      'bg-indigo-500',
+      'bg-red-500',
+      'bg-teal-500',
     ];
 
     // Simple hash function to consistently assign colors
@@ -107,7 +108,7 @@ export default function LeaderboardPage() {
           <div className="flex flex-col items-center mx-4">
             <Avatar className="h-16 w-16 border-2 border-white shadow-lg">
               <AvatarFallback
-                className={`${getAvatarColor("WW")} text-white text-lg`}
+                className={`${getAvatarColor('WW')} text-white text-lg`}
               >
                 WW
               </AvatarFallback>
@@ -134,7 +135,7 @@ export default function LeaderboardPage() {
             </div>
             <Avatar className="h-20 w-20 border-2 border-amber-500 shadow-lg">
               <AvatarFallback
-                className={`${getAvatarColor("LC")} text-white text-xl`}
+                className={`${getAvatarColor('LC')} text-white text-xl`}
               >
                 LC
               </AvatarFallback>
@@ -158,7 +159,7 @@ export default function LeaderboardPage() {
           <div className="flex flex-col items-center mx-4">
             <Avatar className=" h-16 w-16 border-2 border-white shadow-lg">
               <AvatarFallback
-                className={`${getAvatarColor("PP")} text-white text-lg`}
+                className={`${getAvatarColor('PP')} text-white text-lg`}
               >
                 PP
               </AvatarFallback>
@@ -191,8 +192,8 @@ export default function LeaderboardPage() {
               <div
                 key={user.id}
                 className={cn(
-                  "grid grid-cols-12 py-3 px-4 items-center",
-                  user.id === currentUser?.id ? "bg-blue-50" : ""
+                  'grid grid-cols-12 py-3 px-4 items-center',
+                  user.id === currentUser?.id ? 'bg-blue-50' : '',
                 )}
               >
                 <div className="col-span-1 font-medium text-gray-700">
@@ -262,12 +263,12 @@ function UserWithAvatar({
         {user.badge && (
           <div
             className={cn(
-              "absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center",
-              user.badge === "gold"
-                ? "bg-yellow-400"
-                : user.badge === "silver"
-                ? "bg-gray-300"
-                : "bg-amber-600"
+              'absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center',
+              user.badge === 'gold'
+                ? 'bg-yellow-400'
+                : user.badge === 'silver'
+                  ? 'bg-gray-300'
+                  : 'bg-amber-600',
             )}
           >
             <Medal size={12} className="text-white" />
@@ -276,12 +277,12 @@ function UserWithAvatar({
       </div>
       <span
         className={cn(
-          "font-medium",
-          isCurrent ? "text-dark-blue" : "text-gray-800"
+          'font-medium',
+          isCurrent ? 'text-dark-blue' : 'text-gray-800',
         )}
       >
         {user.nama}
-        {isCurrent && " (You)"}
+        {isCurrent && ' (You)'}
       </span>
     </>
   );

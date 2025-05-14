@@ -2,6 +2,7 @@
 
 import { SubtopicMap } from "@/components/battle-map/SubtopicMap";
 import { TopicExplorer } from "@/components/battle-map/TopicExplorer";
+import SimpleLoading from "@/components/loading";
 import { calculateExp } from "@/components/profile/LevelProgress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,10 +33,11 @@ import { useEffect, useState } from "react";
 
 export default function BattlePage() {
   const { topicCategories, userStars } = useBattleMapSubtopic();
-
-  if (topicCategories.length === 0) {
-    return "Loading topic categories";
+  const profile = useUser();
+  if (topicCategories.length === 0 || userStars === -1 || !profile) {
+    return <SimpleLoading />;
   }
+
   const isSpeechRecognitionSupported =
     typeof window !== "undefined" &&
     ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
@@ -47,7 +49,6 @@ export default function BattlePage() {
   );
   const [tempSelectedTopic, setTempSelectedTopic] = useState(selectedTopic);
 
-  console.log(availableTopics);
   const [xpAnimation, setXpAnimation] = useState(false);
   const [showReward, setShowReward] = useState(false);
 
@@ -75,11 +76,8 @@ export default function BattlePage() {
     }
     setIsExploring(false);
   };
-  const profile = useUser();
 
-  if (!profile) {
-    return <div>Loading profile data</div>;
-  }
+  const nextLevel = calculateExp(profile.experience ?? 0);
 
   return (
     <div className="min-h-screen bg-white px-10 py-6 relative">
@@ -88,7 +86,7 @@ export default function BattlePage() {
       {!isSpeechRecognitionSupported && (
         <div className="bg-red-100 text-red-700 px-4 py-3 rounded-md mb-4 border border-red-300 flex items-center">
           <AlertTriangle className="h-5 w-5 mr-2" />
-          Your browser does not support voice recognition features. Please use
+          Your browser does not support voice recpognition features. Please use
           Chrome or another supported browser for the best experience.
           <Button
             variant="outline"
@@ -137,16 +135,13 @@ export default function BattlePage() {
                     }`}
                     style={{
                       width: `${
-                        ((profile.experience ?? 0) /
-                          calculateExp(profile.experience ?? 0).nextLevelExp) *
-                        100
+                        ((profile.experience ?? 0) / nextLevel.maxExp) * 100
                       }%`,
                     }}
                   ></div>
                 </div>
                 <span className="text-xs">
-                  {profile.experience ?? 0}/
-                  {calculateExp(profile.experience ?? 0).nextLevelExp}
+                  {profile.experience ?? 0}/{nextLevel.maxExp}
                 </span>
               </div>
               {xpAnimation && (
