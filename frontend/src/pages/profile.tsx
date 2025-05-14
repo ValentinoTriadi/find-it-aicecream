@@ -1,19 +1,19 @@
-import { fetchAllAchievements, fetchUserAchievements } from '@/api/achievement';
-import SimpleLoading from '@/components/loading';
-import AchievementTab from '@/components/profile/AchievementTab';
-import LevelProgress from '@/components/profile/LevelProgress';
-import ProfileHeader from '@/components/profile/ProfileHeader';
-import StatsTab from '@/components/profile/StatsTab';
-import { useAuth } from '@/context/auth.context';
-import { useUser } from '@/context/user.context';
-import { Trophy } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { fetchAllAchievements, fetchUserAchievements } from "@/api/achievement";
+import SimpleLoading from "@/components/loading";
+import AchievementTab from "@/components/profile/AchievementTab";
+import LevelProgress from "@/components/profile/LevelProgress";
+import ProfileHeader from "@/components/profile/ProfileHeader";
+import StatsTab from "@/components/profile/StatsTab";
+import { useAuth } from "@/context/auth.context";
+import { useUser } from "@/context/user.context";
+import { Trophy } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const DummyUserData = {
-  name: 'John Doe',
-  joinDate: 'March 2025',
+  name: "John Doe",
+  joinDate: "March 2025",
   level: 5,
-  role: 'Beginner',
+  role: "Beginner",
   exp: 1250,
   maxExp: 2000,
   nextLevelExp: 750,
@@ -35,7 +35,7 @@ const DummyUserData = {
 const ProfilePage = () => {
   const auth = useAuth();
   const profile = useUser();
-  const [activeTab, setActiveTab] = useState<'Stats' | 'Achievement'>('Stats');
+  const [activeTab, setActiveTab] = useState<"Stats" | "Achievement">("Stats");
   const [userData, setUserData] = useState(DummyUserData);
   const [achievements, setAchievements] = useState<
     { title: string; icon: JSX.Element; description: string }[]
@@ -74,7 +74,7 @@ const ProfilePage = () => {
         {/* Profile Header */}
         <ProfileHeader
           name={auth.user?.user_metadata?.nama}
-          joinDate={auth.user?.created_at ?? ''}
+          joinDate={auth.user?.created_at ?? ""}
           achievementsUnlocked={userData.achievementsUnlocked}
           exp={profile.experience ?? 0}
           dayStreak={14}
@@ -88,14 +88,14 @@ const ProfilePage = () => {
         {/* Tabs */}
         <div className="mb-2 w-full px-6">
           <div className="grid grid-cols-2 gap-1 mb-4 shadow-md bg-white rounded-md p-1 w-full ">
-            {['Stats', 'Achievement'].map((tab) => (
+            {["Stats", "Achievement"].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab as 'Stats' | 'Achievement')}
+                onClick={() => setActiveTab(tab as "Stats" | "Achievement")}
                 className={`px-6 col-span-1 py-2 rounded-md ${
                   activeTab === tab
-                    ? 'bg-more-stronger-blue/20 text-dark-blue font-medium'
-                    : 'text-dark-blue hover:bg-black/20'
+                    ? "bg-more-stronger-blue/20 text-dark-blue font-medium"
+                    : "text-dark-blue hover:bg-black/20"
                 }`}
               >
                 {tab}
@@ -106,14 +106,14 @@ const ProfilePage = () => {
 
         {/* Tab Content */}
         <div className="px-6">
-          {activeTab === 'Stats' && (
+          {activeTab === "Stats" && (
             <StatsTab
               skills={userData.skills}
               battleStats={userData.battleStats}
             />
           )}
 
-          {activeTab === 'Achievement' &&
+          {activeTab === "Achievement" &&
             (loading ? (
               <SimpleLoading />
             ) : (
