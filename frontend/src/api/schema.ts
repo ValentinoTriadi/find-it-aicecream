@@ -7,4 +7,5 @@ export interface RegisterBody {
 export interface LoginBody {
   email: string;
   password: string;
+  redirect?: string;
 }

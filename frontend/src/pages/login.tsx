@@ -5,8 +5,12 @@ import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   const auth = useAuth();
+
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get("redirect") || undefined;
+
   if (auth.user) {
-    window.location.href = "/";
+    window.location.href = redirect || "/";
   }
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -23,7 +27,7 @@ const LoginPage = () => {
           </CardHeader>
 
           <CardContent className="p-6 px-12">
-            <LoginForm />
+            <LoginForm redirect={redirect} />
 
             <div className="mt-6 text-center">
               <p className="text-gray-600">

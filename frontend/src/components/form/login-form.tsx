@@ -24,7 +24,7 @@ const loginSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
-export const LoginForm = () => {
+export const LoginForm = ({ redirect }: { redirect?: string }) => {
   const [isPasswordShown, setPasswordShown] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -44,6 +44,7 @@ export const LoginForm = () => {
       await auth.login({
         email: data.email,
         password: data.password,
+        redirect: redirect,
       });
     } catch (error) {
       if (error instanceof Error && error.message) {
