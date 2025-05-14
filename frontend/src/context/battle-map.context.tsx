@@ -4,17 +4,17 @@ import {
   getAllTopicWithSubTopicAndStar,
   getCountStarUser,
   getTopicStarCount,
-} from '@/api/battle-map';
-import { Globe, Hotel, Plane, ShoppingBag, Utensils } from 'lucide-react';
+} from "@/api/battle-map";
+import { Globe, Hotel, Plane, ShoppingBag, Utensils } from "lucide-react";
 import React, {
   ReactNode,
   createContext,
   useContext,
   useEffect,
   useState,
-} from 'react';
+} from "react";
 
-import { useUser } from './user.context';
+import { useUser } from "./user.context";
 
 // Type definitions
 export interface Role {
@@ -66,11 +66,11 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 };
 
 const COLOR_MAP: Record<string, string> = {
-  airport: '#5cb176',
-  restaurant: '#ffc83d',
-  supermarket: '#ef5261',
-  publictransport: '#87ceeb',
-  hotel: '#f7ebfe',
+  airport: "#5cb176",
+  restaurant: "#ffc83d",
+  supermarket: "#ef5261",
+  publictransport: "#87ceeb",
+  hotel: "#f7ebfe",
 };
 
 export const BattleMapSubtopicProvider = ({
@@ -92,7 +92,8 @@ export const BattleMapSubtopicProvider = ({
         return;
       }
       // const topics = await getAllTopic();
-      const star = await getCountStarUser(profile.user.id ?? 0);
+      const star = await getCountStarUser(profile.user.id);
+      console.log("STARS: ", star);
       setUserStars(star);
       // Fetch all subtopics for all topics
       // const subtopicPromises = topics.map((topic: any) =>
@@ -107,7 +108,7 @@ export const BattleMapSubtopicProvider = ({
         topics.map(async (topic: TopicCategory, idx: number) => {
           // Use topic.name (lowercase, no space) as key for icon/color, fallback if not found
 
-          const key = topic.name.toLowerCase().replace(/\s/g, '');
+          const key = topic.name.toLowerCase().replace(/\s/g, "");
           const topicStar = await getTopicStarCount(topic.id);
 
           setSubtopicStars((prev) => ({
@@ -119,19 +120,16 @@ export const BattleMapSubtopicProvider = ({
             id: topic.id,
             name: topic.name,
             icon: ICON_MAP[key] || <Plane className="text-white w-8 h-8" />,
-            color: COLOR_MAP[key] || '#5cb176',
-            bgColor: COLOR_MAP[key] || '#5cb176',
+            color: COLOR_MAP[key] || "#5cb176",
+            bgColor: COLOR_MAP[key] || "#5cb176",
             subtopic: topic.subtopic,
           };
-        }),
+        })
       );
-      console.log('Stars: ', subtopicStars);
-
-      setUserStars(userStars);
 
       setTopicCategories(categories);
     } catch (err) {
-      console.error('Error fetching battlemap subtopics:', err);
+      console.error("Error fetching battlemap subtopics:", err);
     } finally {
       setLoading(false);
     }
@@ -160,7 +158,7 @@ export const useBattleMapSubtopic = (): BattleMapSubtopicContextType => {
   const context = useContext(BattleMapSubtopicContext);
   if (!context) {
     throw new Error(
-      'useBattleMapSubtopic must be used within a BattleMapSubtopicProvider',
+      "useBattleMapSubtopic must be used within a BattleMapSubtopicProvider"
     );
   }
   return context;
