@@ -1,7 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 
 import './App.css';
-import { BattleMapProvider } from './context/battle-map.context';
 import { BattleMapLayout } from './layout/battle-map-layout';
 import ProtectedMenuLayout from './layout/menu-layout';
 import AchievementsPage from './pages/achievement';

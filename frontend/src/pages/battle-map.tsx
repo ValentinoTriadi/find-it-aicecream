@@ -1,35 +1,32 @@
-"use client";
+'use client';
 
-import { SubtopicMap } from "@/components/battle-map/SubtopicMap";
-import { TopicExplorer } from "@/components/battle-map/TopicExplorer";
-import SimpleLoading from "@/components/loading";
-import { calculateExp } from "@/components/profile/LevelProgress";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import type { SubTopic, Topic } from "@/constant";
+import { SubtopicMap } from '@/components/battle-map/SubtopicMap';
+import { TopicExplorer } from '@/components/battle-map/TopicExplorer';
+import SimpleLoading from '@/components/loading';
+import { calculateExp } from '@/components/profile/LevelProgress';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import {
   TopicCategory,
   useBattleMapSubtopic,
-} from "@/context/battle-map.context";
-import { useUser } from "@/context/user.context";
-import { cn } from "@/lib/utils";
+} from '@/context/battle-map.context';
+import { useUser } from '@/context/user.context';
+import { cn } from '@/lib/utils';
 import {
   ArrowLeft,
   ArrowRight,
   Flame,
   Globe,
-  Plane,
   Shield,
-  ShoppingBag,
   Star,
   Swords,
   Trophy,
   Utensils,
   Zap,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function BattlePage() {
   const { topicCategories, userStars } = useBattleMapSubtopic();
@@ -39,13 +36,13 @@ export default function BattlePage() {
   }
 
   const isSpeechRecognitionSupported =
-    typeof window !== "undefined" &&
-    ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
+    typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
   const [isExploring, setIsExploring] = useState(false);
   const [availableTopics, setAvailableTopics] = useState(topicCategories);
   const [selectedTopic, setSelectedTopic] = useState<TopicCategory>(
-    availableTopics[0]
+    availableTopics[0],
   );
   const [tempSelectedTopic, setTempSelectedTopic] = useState(selectedTopic);
 
@@ -131,7 +128,7 @@ export default function BattlePage() {
                 <div className="w-24 h-2 bg-blue-950 rounded-full overflow-hidden">
                   <div
                     className={`h-full bg-gradient-to-r from-yellow-400 to-yellow-300 rounded-full transition-all duration-1000 ${
-                      xpAnimation ? "animate-pulse" : ""
+                      xpAnimation ? 'animate-pulse' : ''
                     }`}
                     style={{
                       width: `${
@@ -182,11 +179,11 @@ export default function BattlePage() {
             )}
           </h1>
           <Button
-            variant={isExploring ? "ghost" : "outline"}
+            variant={isExploring ? 'ghost' : 'outline'}
             className={cn(
               isExploring
-                ? "text-blue-700 flex items-center gap-2 hover:bg-blue-50"
-                : "bg-white text-blue-600 border border-blue-400 hover:bg-blue-50"
+                ? 'text-blue-700 flex items-center gap-2 hover:bg-blue-50'
+                : 'bg-white text-blue-600 border border-blue-400 hover:bg-blue-50',
             )}
             onClick={() => setIsExploring(!isExploring)}
           >
