@@ -16,8 +16,8 @@ export default function AchievementTab({
   achievements,
 }: AchievementTabProps) {
   return (
-    <div className="bg-card rounded-xl p-6">
-      <h3 className="text-lg font-semibold text-[#0a3b56] mb-4">
+    <div className="bg-white shadow-md rounded-xl p-6">
+      <h3 className="text-lg font-semibold text-more-stronger-blue mb-4">
         Your Achievements
       </h3>
       <p className="text-gray-600 mb-4">

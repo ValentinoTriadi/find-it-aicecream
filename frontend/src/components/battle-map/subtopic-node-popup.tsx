@@ -93,6 +93,9 @@ export function SubtopicNodePopup({
               </div>
             </div>
           </DialogHeader>
+          <DialogClose className='text-white'>
+
+          </DialogClose>
         </div>
 
         <div className="px-6 pb-6">

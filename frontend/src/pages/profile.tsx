@@ -77,31 +77,33 @@ const ProfilePage = () => {
   const [userData, setUserData] = useState(DummyUserData);
   const [achievements, setAchievements] = useState(DummyAchievements);
   return (
-    <div className="flex-1 p-8 overflow-auto">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="flex-1 overflow-auto">
+      <div className=" space-y-6">
         {/* Profile Header */}
         <ProfileHeader
           name={auth.user?.user_metadata?.nama}
           joinDate={auth.user?.created_at ?? ""}
           achievementsUnlocked={userData.achievementsUnlocked}
           exp={profile.experience ?? 0}
+          dayStreak={14}
           handleLogout={() => auth.logout()}
         />
 
         {/* Level Progress */}
-        <LevelProgress exp={profile.experience ?? 0} />
-
+        <div className="px-6">
+          <LevelProgress exp={profile.experience ?? 0} />
+        </div>
         {/* Tabs */}
-        <div className="mb-2">
-          <div className="inline-flex bg-card rounded-md p-1 gap-1">
+        <div className="mb-2 w-full px-6">
+          <div className="grid grid-cols-2 gap-1 mb-4 shadow-md bg-white rounded-md p-1 w-full ">
             {["Stats", "Achievement"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as "Stats" | "Achievement")}
-                className={`px-6 py-2 rounded-[4px] ${
+                className={`px-6 col-span-1 py-2 rounded-md ${
                   activeTab === tab
-                    ? "bg-white text-[#0a3b56] font-medium"
-                    : "text-[#0a3b56] hover:bg-white/50"
+                    ? "bg-more-stronger-blue/20 text-dark-blue font-medium"
+                    : "text-dark-blue hover:bg-black/20"
                 }`}
               >
                 {tab}
@@ -111,20 +113,22 @@ const ProfilePage = () => {
         </div>
 
         {/* Tab Content */}
-        {activeTab === "Stats" && (
-          <StatsTab
-            skills={userData.skills}
-            battleStats={userData.battleStats}
-          />
-        )}
+        <div className="px-6">
+          {activeTab === "Stats" && (
+            <StatsTab
+              skills={userData.skills}
+              battleStats={userData.battleStats}
+            />
+          )}
 
-        {activeTab === "Achievement" && (
-          <AchievementTab
-            unlocked={userData.achievementsUnlocked}
-            total={userData.totalAchievements}
-            achievements={achievements}
-          />
-        )}
+          {activeTab === "Achievement" && (
+            <AchievementTab
+              unlocked={userData.achievementsUnlocked}
+              total={userData.totalAchievements}
+              achievements={achievements}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
