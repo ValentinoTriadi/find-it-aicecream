@@ -8,7 +8,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
@@ -34,7 +34,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (res.user) {
           setUser(res.user);
         } else {
-          navigate("/login");
+          navigate(
+            `/login?redirect=${encodeURIComponent(
+              window.location.pathname + window.location.search
+            )}`
+          );
         }
       })
       .catch((error) => {
@@ -44,12 +48,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (body: LoginBody) => {
     try {
-      const res = await signInWithEmail(body);
+      const res = await signInWithEmail({
+        email: body.email,
+        password: body.password,
+      });
 
       // Set user
       setUser(res.user);
 
-      navigate("/profile");
+      navigate(body.redirect || "/profile");
     } catch (error) {
       console.error("Error signing in:", error);
       throw new Error("Email or password is incorrect");
