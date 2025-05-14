@@ -1,4 +1,4 @@
-import { BarChart2, Star, Swords } from 'lucide-react';
+import { BarChart2, Star, Swords } from "lucide-react";
 
 interface StatsTabProps {
   skills: Record<string, number>;
@@ -15,7 +15,7 @@ export default function StatsTab({ skills, battleStats }: StatsTabProps) {
       <Star
         key={i}
         className={`w-5 h-5 ${
-          i < count ? 'fill-[#ffc107] text-[#ffc107]' : 'text-gray-300'
+          i < count ? "fill-[#ffc107] text-[#ffc107]" : "text-gray-300"
         }`}
       />
     ));
