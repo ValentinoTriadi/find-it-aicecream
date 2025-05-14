@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 @tailwind utilities;
 @custom-variant dark (&:is(.dark *));
 
@@ -7,16 +7,16 @@ body,
 html {
   margin: 0 auto;
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 ::-webkit-scrollbar {
@@ -158,7 +158,7 @@ code {
   --color-primary-border: #9d9d9d;
   --color-primary-border-fg: #6c6c6c;
   --color-yellow-star: #ffd24e;
-
+  --color-blue-lighter: '#5bb4e5';
   --text-title-hero: 4.5rem;
   --text-title-hero-line: 5.4rem;
   --font-weight-title-hero-weight: 700;

@@ -1,3 +1,4 @@
+import { TopicCategory } from '@/context/battle-map.context';
 import supabase from '@/utils/supabase';
 
 export async function getAllTopic() {
@@ -138,4 +139,51 @@ export async function getLastSubTopicDone(topicId: number, userId: string) {
   }
 
   return data[0]?.sub_topic_id || -1;
+}
+
+export async function getAllTopicWithSubTopicAndStar() {
+  const { data, error } = await supabase
+    .from('topic')
+    .select('*, sub_topic(*, sub_topic_star(*))');
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  // console.log("ALL TOPIC + SUB + STAR: ", data);
+
+  const newData : TopicCategory[] = data.map((topic, topidx) => {
+    const subTopics = topic.sub_topic.map((subTopic: any, subidx: any) => {
+      const subTopicStar = subTopic.sub_topic_star[0].star || 0;
+      return {
+        id: subTopic.id,
+        name: subTopic.name,
+        level: topidx + 1 + '-' + (subidx + 1),
+        description: subTopic.description,
+        points: 50,
+        stars: subTopicStar,
+        unlocked: subidx == 0 ? true : false,
+        battleWon: 0,
+        averageTime: 0,
+        bestScore: 0,
+        roles:   [
+          { name: 'Leader', desc: 'Gives instructions to teammates' },
+          { name: 'Follower', desc: 'Executes tasks based on given orders' },
+        ],
+        topic_id : topic.id
+      };
+    });
+    return {
+      id: topic.id,
+      name: topic.name,
+      icon: '',
+      color: '',
+      bgColor: '',
+      subtopic: subTopics,
+    };
+  });
+
+  console.log('NEW DATA: ', newData);
+
+  return newData as TopicCategory[];
 }

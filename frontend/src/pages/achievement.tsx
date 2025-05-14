@@ -1,14 +1,22 @@
-import { Trophy } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useAuth } from "@/context/auth.context";
-import { fetchAllAchievements, fetchUserAchievements } from "@/api/achievement";
+import { fetchAllAchievements, fetchUserAchievements } from '@/api/achievement';
+import { useAuth } from '@/context/auth.context';
+import {
+  Award,
+  BarChart2,
+  BookOpen,
+  MessageSquare,
+  Swords,
+  Trophy,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-type AchievementCategory = "All" | "Battle" | "Personal";
 
 interface Achievement {
+  id: number;
   title: string;
   icon: JSX.Element;
   description: string;
+  category: string;
   completed?: boolean;
 }
 
@@ -25,7 +33,7 @@ interface AchievementWithProgress extends Achievement {
 
 export default function AchievementsPage() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<AchievementCategory>("All");
+  const [activeTab, setActiveTab] = useState<string>('All');
   const [allAchievements, setAllAchievements] = useState<
     AchievementWithProgress[]
   >([]);
@@ -41,14 +49,14 @@ export default function AchievementsPage() {
         const merged: AchievementWithProgress[] = achievements.map(
           (a: Achievement) => {
             const userA = userAchievements.find(
-              (ua: UserAchievement) => ua.achievement_id === a.id
+              (ua: UserAchievement) => ua.achievement_id === a.id,
             );
             return {
               ...a,
               progress: userA ? userA.progress : 0,
               completed: userA ? userA.completed : false,
             };
-          }
+          },
         );
         setAllAchievements(merged);
       })
@@ -56,7 +64,7 @@ export default function AchievementsPage() {
   }, [user]);
 
   const filteredAchievements =
-    activeTab === "All"
+    activeTab === 'All'
       ? allAchievements
       : allAchievements.filter((a) => a.category === activeTab);
 
@@ -67,12 +75,14 @@ export default function AchievementsPage() {
   }
 
   return (
-    <div className="flex-1 p-8 overflow-auto">
-      <div className="max-w-6xl mx-auto">
+    <div className="flex-1 px-10 p-8 overflow-auto">
+      <div className="w-full mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-dark-blue">Achievements</h1>
-          <div className="flex items-center gap-2 text-dark-blue">
+          <h1 className="text-3xl font-bold text-more-stronger-blue">
+            Achievements
+          </h1>
+          <div className="flex items-center gap-2 text-more-stronger-blue">
             <Trophy className="w-5 h-5 text-stronger-blue" />
             <span className="text-lg">
               {completedCount}/{allAchievements.length} Completed
@@ -82,15 +92,15 @@ export default function AchievementsPage() {
 
         {/* Tabs */}
         <div className="mb-8">
-          <div className="inline-flex bg-card rounded-md p-1">
-            {["All", "Battle", "Personal"].map((tab) => (
+          <div className="grid gap-1 grid-cols-3 bg-white rounded-md p-1">
+            {['All', 'Battle', 'Personal'].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab as AchievementCategory)}
+                onClick={() => setActiveTab(tab)}
                 className={`px-6 py-2 rounded-md ${
                   activeTab === tab
-                    ? "bg-white text-dark-blue font-medium"
-                    : "text-dark-blue hover:bg-white/50"
+                    ? 'bg-more-stronger-blue/20 text-dark-blue font-medium'
+                    : 'text-dark-blue hover:bg-black/20'
                 }`}
               >
                 {tab}
@@ -104,16 +114,16 @@ export default function AchievementsPage() {
           {filteredAchievements.map((achievement) => (
             <div
               key={achievement.id}
-              className={`rounded-lg p-6 border ${
+              className={`rounded-lg p-6 shadow-md border ${
                 achievement.completed
-                  ? "bg-card border-stronger-blue"
-                  : "bg-white border-gray-200"
+                  ? ' border-yellow-400'
+                  : ' border-gray-200'
               }`}
             >
               <div className="flex items-start gap-4">
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    achievement.completed ? "bg-stronger-blue" : "bg-gray-300"
+                    achievement.completed ? 'bg-yellow-400' : 'bg-gray-300'
                   }`}
                 >
                   <Trophy className="w-6 h-6 text-white" />
@@ -130,7 +140,7 @@ export default function AchievementsPage() {
                       {achievement.progress}% Completed
                     </span>
                     {achievement.completed && (
-                      <span className="text-stronger-blue font-medium">
+                      <span className="text-yellow-400 font-medium">
                         Completed
                       </span>
                     )}

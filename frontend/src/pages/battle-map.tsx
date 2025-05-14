@@ -1,197 +1,197 @@
-'use client';
+"use client";
 
-import { SubtopicMap } from '@/components/battle-map/SubtopicMap';
-import { TopicExplorer } from '@/components/battle-map/TopicExplorer';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { SubTopic, Topic } from '@/constant';
-import { cn } from '@/lib/utils';
+import { SubtopicMap } from "@/components/battle-map/SubtopicMap";
+import { TopicExplorer } from "@/components/battle-map/TopicExplorer";
+import { calculateExp } from "@/components/profile/LevelProgress";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import type { SubTopic, Topic } from "@/constant";
+import {
+  TopicCategory,
+  useBattleMapSubtopic,
+} from "@/context/battle-map.context";
+import { useUser } from "@/context/user.context";
+import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   ArrowRight,
+  Flame,
   Globe,
   Plane,
+  Shield,
   ShoppingBag,
+  Star,
+  Swords,
+  Trophy,
   Utensils,
-} from 'lucide-react';
-import { useState } from 'react';
-
-const SUBTOPIC_CATEGORIES: SubTopic[] = [
-  {
-    id: 1,
-    name: 'Order',
-    level: '1-1',
-    description:
-      'Learn how to follow and give basic orders in everyday situations.',
-    points: 50,
-    stars: 1,
-    unlocked: true,
-    battleWon: 3,
-    averageTime: 115,
-    bestScore: 85,
-    roles: [
-      { name: 'Leader', desc: 'Gives instructions to teammates' },
-      { name: 'Follower', desc: 'Executes tasks based on given orders' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Order-2',
-    level: '1-2',
-    description: 'Practice more complex command structures and interactions.',
-    points: 100,
-    stars: 0,
-    unlocked: true,
-    battleWon: 1,
-    averageTime: 132,
-    bestScore: 72,
-    roles: [
-      { name: 'Commander', desc: 'Directs team strategy and calls out plays' },
-      {
-        name: 'Operator',
-        desc: 'Carries out tactical actions based on commands',
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Locked 1',
-    level: '1-3',
-    description:
-      'Advanced coordination between roles for time-sensitive missions.',
-    points: 200,
-    stars: 0,
-    unlocked: false,
-    battleWon: 0,
-    averageTime: 0,
-    bestScore: 0,
-    roles: [
-      {
-        name: 'Strategist',
-        desc: 'Analyzes the battlefield and adjusts plans',
-      },
-      { name: 'Executor', desc: 'Executes high-risk and precise tasks' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Locked 2',
-    level: '1-4',
-    description:
-      'Engage in multi-role scenarios requiring perfect timing and synergy.',
-    points: 200,
-    stars: 0,
-    unlocked: false,
-    battleWon: 0,
-    averageTime: 0,
-    bestScore: 0,
-    roles: [
-      {
-        name: 'Coordinator',
-        desc: 'Keeps track of all moving pieces during missions',
-      },
-      { name: 'Runner', desc: 'Performs key actions quickly and efficiently' },
-    ],
-  },
-  {
-    id: 5,
-    name: 'Locked 3',
-    level: '2-1',
-    description: 'Start your next tier of training with hybrid role mechanics.',
-    points: 200,
-    stars: 0,
-    unlocked: false,
-    battleWon: 0,
-    averageTime: 0,
-    bestScore: 0,
-    roles: [
-      { name: 'Hybrid', desc: 'Combines support and combat capabilities' },
-      { name: 'Anchor', desc: 'Holds position and provides stability to team' },
-    ],
-  },
-];
-
-const TOPIC_CATEGORIES: Topic[] = [
-  {
-    id: 'travel',
-    name: 'Travel',
-    icon: <Plane className="text-primary-blue w-8 h-8" />,
-    color: '#5cb176',
-    bgColor: '#5cb176',
-    subtopic: SUBTOPIC_CATEGORIES,
-  },
-  {
-    id: 'food',
-    name: 'Restaurants',
-
-    icon: <Utensils className="text-primary-blue w-8 h-8" />,
-    color: '#ffc83d',
-    bgColor: '#ffc83d',
-    subtopic: [],
-  },
-  {
-    id: 'shopping',
-    name: 'Shopping',
-
-    icon: <ShoppingBag className="text-primary-blue w-8 h-8" />,
-    color: '#ef5261',
-    bgColor: '#ef5261',
-    subtopic: [],
-  },
-  {
-    id: 'essentials',
-    name: 'Essentials',
-
-    icon: <Globe className="text-primary-blue w-8 h-8" />,
-    color: '#87ceeb',
-    bgColor: '#87ceeb',
-    subtopic: SUBTOPIC_CATEGORIES,
-  },
-];
+  Zap,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function BattlePage() {
+  const { topicCategories, userStars } = useBattleMapSubtopic();
+
+  if (topicCategories.length === 0) {
+    return "Loading topic categories";
+  }
   const isSpeechRecognitionSupported =
-    typeof window !== 'undefined' &&
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+    typeof window !== "undefined" &&
+    ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
 
   const [isExploring, setIsExploring] = useState(false);
-  const [availableTopics, setAvailableTopics] = useState(TOPIC_CATEGORIES);
-  const [selectedTopic, setSelectedTopic] = useState(TOPIC_CATEGORIES[0]);
+  const [availableTopics, setAvailableTopics] = useState(topicCategories);
+  const [selectedTopic, setSelectedTopic] = useState<TopicCategory>(
+    availableTopics[0]
+  );
   const [tempSelectedTopic, setTempSelectedTopic] = useState(selectedTopic);
 
-  const handleTempCategorySelect = (categoryId: string) => {
+  console.log(availableTopics);
+  const [xpAnimation, setXpAnimation] = useState(false);
+  const [showReward, setShowReward] = useState(false);
+
+  // Simulate XP gain for demo purposes
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setXpAnimation(true);
+      setTimeout(() => setXpAnimation(false), 2000);
+    }, 15000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleTempCategorySelect = (categoryId: number) => {
     const topic = availableTopics.find((c) => c.id === categoryId);
     if (topic) setTempSelectedTopic(topic);
   };
 
-  const handleCategorySelect = (categoryId: string) => {
+  const handleCategorySelect = (categoryId: number) => {
     const topic = availableTopics.find((c) => c.id === categoryId);
     if (topic) {
       setSelectedTopic(topic);
       setTempSelectedTopic(topic);
+      setShowReward(true);
+      setTimeout(() => setShowReward(false), 3000);
     }
     setIsExploring(false);
   };
+  const profile = useUser();
+
+  if (!profile) {
+    return <div>Loading profile data</div>;
+  }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-white px-10 py-6 relative">
+      {/* Floating reward animation */}
+
       {!isSpeechRecognitionSupported && (
-        <div className="bg-red-100 text-red-700 px-4 py-2 rounded-md mb-4">
-          ⚠️ Your browser does not support voice recognition features. Please
-          use Chrome or another supported browser for the best experience.
+        <div className="bg-red-100 text-red-700 px-4 py-3 rounded-md mb-4 border border-red-300 flex items-center">
+          <AlertTriangle className="h-5 w-5 mr-2" />
+          Your browser does not support voice recognition features. Please use
+          Chrome or another supported browser for the best experience.
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {}}
+            className="ml-auto border-red-300 text-red-600 hover:bg-red-50"
+          >
+            Dismiss
+          </Button>
         </div>
       )}
-      <div className="max-w-6xl mx-auto">
+
+      <div className=" mx-auto">
+        {/* Header with User Stats */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-md">
+          <div className="flex items-center">
+            <div className="relative">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-dark-blue p-1 mr-4">
+                <div className="w-full h-full rounded-full bg-dark-blue flex items-center justify-center">
+                  <span className="text-xl text-white font-bold">LW</span>
+                </div>
+              </div>
+              <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white">
+                {calculateExp(profile.experience ?? 0).lvl}
+              </div>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-dark-blue">
+                {calculateExp(profile.experience ?? 0).role}
+              </h2>
+              <Badge className="bg-more-stronger-blue text-white">
+                Level {calculateExp(profile.experience ?? 0).lvl}
+              </Badge>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
+            {/* XP Bar */}
+            <div className="relative bg-dark-blue text-white px-3 py-1 rounded-full items-center">
+              <div className="flex items-center mt-1 gap-1">
+                <Zap className="h-4 w-4 text-yellow-400" />
+                <div className="w-24 h-2 bg-blue-950 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full bg-gradient-to-r from-yellow-400 to-yellow-300 rounded-full transition-all duration-1000 ${
+                      xpAnimation ? "animate-pulse" : ""
+                    }`}
+                    style={{
+                      width: `${
+                        ((profile.experience ?? 0) /
+                          calculateExp(profile.experience ?? 0).nextLevelExp) *
+                        100
+                      }%`,
+                    }}
+                  ></div>
+                </div>
+                <span className="text-xs">
+                  {profile.experience ?? 0}/
+                  {calculateExp(profile.experience ?? 0).nextLevelExp}
+                </span>
+              </div>
+              {xpAnimation && (
+                <div className="absolute -top-3 right-0 text-yellow-300 text-xs font-bold animate-bounce">
+                  +15 XP!
+                </div>
+              )}
+            </div>
+
+            {/* Stars */}
+            <div className="bg-more-stronger-blue text-white px-3 py-1 rounded-full flex items-center">
+              <Star className="h-4 w-4 text-yellow-300 mr-1 fill-yellow-300" />
+              <span>{userStars}</span>
+            </div>
+
+            {/* Streak */}
+            <div className="bg-red-500 text-white px-3 py-1 rounded-full flex items-center">
+              <Flame className="h-4 w-4 mr-1" />
+              <span>{14} day streak</span>
+            </div>
+
+            {/* Coins */}
+          </div>
+        </div>
+
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-dark-blue">
-            {isExploring ? 'Topic Explorer' : 'Battle Map'}
+          <h1 className="text-3xl font-bold text-blue-800 flex items-center">
+            {isExploring ? (
+              <>
+                <Globe className="h-8 w-8 mr-2 text-blue-600" />
+                Topic Explorer
+              </>
+            ) : (
+              <>
+                <Swords className="h-8 w-8 mr-2 text-blue-600" />
+                Battle Map
+              </>
+            )}
           </h1>
           <Button
-            variant="ghost"
+            variant={isExploring ? "ghost" : "outline"}
             className={cn(
               isExploring
-                ? 'text-dark-blue flex items-center gap-2'
-                : 'bg-white text-more-stronger-blue border border-more-stronger-blue hover:bg-blue-50',
+                ? "text-blue-700 flex items-center gap-2 hover:bg-blue-50"
+                : "bg-white text-blue-600 border border-blue-400 hover:bg-blue-50"
             )}
             onClick={() => setIsExploring(!isExploring)}
           >
@@ -202,11 +202,35 @@ export default function BattlePage() {
               </>
             ) : (
               <>
-                <ArrowRight className="w-4 h-4 ml-2" />
                 Explore All Topics
+                <ArrowRight className="w-4 h-4 ml-2" />
               </>
             )}
           </Button>
+        </div>
+
+        {/* Daily Challenge Banner */}
+        <div className="mb-6 bg-gradient-to-r from-dark-blue to-dark-blue/80 rounded-xl p-4 text-white flex justify-between items-center shadow-lg">
+          <div className="flex items-center">
+            <div className="bg-yellow-500/20 p-2 rounded-full mr-3">
+              <Trophy className="h-6 w-6 text-yellow-400" />
+            </div>
+            <div>
+              <h3 className="font-bold">Daily Challenge</h3>
+              <p className="text-sm text-blue-100">
+                Complete 3 battles today for bonus rewards!
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-center">
+              <div className="text-xs text-blue-200">Progress</div>
+              <div className="flex items-center gap-1">
+                <Shield className="h-4 w-4 text-green-400" />
+                <span className="font-bold">1/3</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {isExploring ? (
@@ -219,16 +243,33 @@ export default function BattlePage() {
           <SubtopicMap selectedTopic={selectedTopic} />
         )}
 
-        <Card className="p-6 bg-white mt-auto border rounded-xl">
+        <Card className="p-6 bg-white mt-6 border border-blue-200 rounded-xl shadow-md">
           <div className="flex justify-between items-center">
             <div>
-              <div className="text-gray-500 text-sm">
+              <div className="text-blue-500 text-sm">
                 Topic {isExploring ? tempSelectedTopic.id : selectedTopic.id}
               </div>
-              <h2 className="text-2xl font-bold text-dark-blue">
+              <h2 className="text-2xl font-bold text-blue-800">
                 {isExploring ? tempSelectedTopic.name : selectedTopic.name}
               </h2>
             </div>
+
+            {/* Topic progress */}
+            {!isExploring && (
+              <div className="hidden md:block w-1/3">
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-blue-600 font-medium">
+                    Topic Progress
+                  </span>
+                  <span className="text-blue-800 font-medium">
+                    1/5 Completed
+                  </span>
+                </div>
+                <Progress value={20} className="h-2 bg-blue-100">
+                  <div className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"></div>
+                </Progress>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-between mt-6">
@@ -236,38 +277,42 @@ export default function BattlePage() {
               <>
                 <Button
                   variant="outline"
-                  className="text-blue-400 border-blue-400"
+                  className="text-blue-600 border-blue-300 hover:bg-blue-50"
                   onClick={() => setIsExploring(false)}
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Cancel Explore Topic
                 </Button>
                 <Button
-                  className="bg-stronger-blue hover:bg-more-stronger-blue text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={() => handleCategorySelect(tempSelectedTopic.id)}
                 >
                   Choose Topic
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  className="text-stronger-blue border-stronger-blue bg-white hover:text-more-stronger-blue hover:border-more-stronger-blue"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Previous Topic
-                </Button>
-                <Button className="bg-stronger-blue hover:bg-more-stronger-blue text-white">
-                  Next Topic
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </>
-            )}
+            ) : null}
           </div>
         </Card>
       </div>
     </div>
   );
 }
+
+// Add missing components for the demo
+const AlertTriangle = ({ className }: { className: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+    <path d="M12 9v4" />
+    <path d="M12 17h.01" />
+  </svg>
+);
