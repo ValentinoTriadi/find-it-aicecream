@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { SubtopicMap } from "@/components/battle-map/SubtopicMap";
-import { TopicExplorer } from "@/components/battle-map/TopicExplorer";
-import { calculateExp } from "@/components/profile/LevelProgress";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import type { SubTopic, Topic } from "@/constant";
+import { SubtopicMap } from '@/components/battle-map/SubtopicMap';
+import { TopicExplorer } from '@/components/battle-map/TopicExplorer';
+import { calculateExp } from '@/components/profile/LevelProgress';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import type { SubTopic, Topic } from '@/constant';
 import {
   TopicCategory,
   useBattleMapSubtopic,
-} from "@/context/battle-map.context";
-import { useUser } from "@/context/user.context";
-import { cn } from "@/lib/utils";
+} from '@/context/battle-map.context';
+import { useUser } from '@/context/user.context';
+import { cn } from '@/lib/utils';
 import {
   ArrowLeft,
   ArrowRight,
@@ -27,27 +27,30 @@ import {
   Trophy,
   Utensils,
   Zap,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function BattlePage() {
   const { topicCategories, userStars } = useBattleMapSubtopic();
 
   if (topicCategories.length === 0) {
-    return "Loading topic categories";
+    return 'Loading topic categories';
   }
+  if (userStars === -1) {
+    return 'Loading stars';
+  }
+
   const isSpeechRecognitionSupported =
-    typeof window !== "undefined" &&
-    ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
+    typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
   const [isExploring, setIsExploring] = useState(false);
   const [availableTopics, setAvailableTopics] = useState(topicCategories);
   const [selectedTopic, setSelectedTopic] = useState<TopicCategory>(
-    availableTopics[0]
+    availableTopics[0],
   );
   const [tempSelectedTopic, setTempSelectedTopic] = useState(selectedTopic);
 
-  console.log(availableTopics);
   const [xpAnimation, setXpAnimation] = useState(false);
   const [showReward, setShowReward] = useState(false);
 
@@ -81,6 +84,8 @@ export default function BattlePage() {
     return <div>Loading profile data</div>;
   }
 
+  const nextLevel = calculateExp(profile.experience ?? 0);
+
   return (
     <div className="min-h-screen bg-white px-10 py-6 relative">
       {/* Floating reward animation */}
@@ -88,7 +93,7 @@ export default function BattlePage() {
       {!isSpeechRecognitionSupported && (
         <div className="bg-red-100 text-red-700 px-4 py-3 rounded-md mb-4 border border-red-300 flex items-center">
           <AlertTriangle className="h-5 w-5 mr-2" />
-          Your browser does not support voice recognition features. Please use
+          Your browser does not support voice recpognition features. Please use
           Chrome or another supported browser for the best experience.
           <Button
             variant="outline"
@@ -133,20 +138,17 @@ export default function BattlePage() {
                 <div className="w-24 h-2 bg-blue-950 rounded-full overflow-hidden">
                   <div
                     className={`h-full bg-gradient-to-r from-yellow-400 to-yellow-300 rounded-full transition-all duration-1000 ${
-                      xpAnimation ? "animate-pulse" : ""
+                      xpAnimation ? 'animate-pulse' : ''
                     }`}
                     style={{
                       width: `${
-                        ((profile.experience ?? 0) /
-                          calculateExp(profile.experience ?? 0).nextLevelExp) *
-                        100
+                        ((profile.experience ?? 0) / nextLevel.maxExp) * 100
                       }%`,
                     }}
                   ></div>
                 </div>
                 <span className="text-xs">
-                  {profile.experience ?? 0}/
-                  {calculateExp(profile.experience ?? 0).nextLevelExp}
+                  {profile.experience ?? 0}/{nextLevel.maxExp}
                 </span>
               </div>
               {xpAnimation && (
@@ -187,11 +189,11 @@ export default function BattlePage() {
             )}
           </h1>
           <Button
-            variant={isExploring ? "ghost" : "outline"}
+            variant={isExploring ? 'ghost' : 'outline'}
             className={cn(
               isExploring
-                ? "text-blue-700 flex items-center gap-2 hover:bg-blue-50"
-                : "bg-white text-blue-600 border border-blue-400 hover:bg-blue-50"
+                ? 'text-blue-700 flex items-center gap-2 hover:bg-blue-50'
+                : 'bg-white text-blue-600 border border-blue-400 hover:bg-blue-50',
             )}
             onClick={() => setIsExploring(!isExploring)}
           >

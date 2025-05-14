@@ -60,6 +60,33 @@ export async function getAllSubTopicWithStar(topicId: number) {
 
   return data;
 }
+
+export async function getTopicStarCount(topicId: number) {
+  const { data, error } = await supabase
+    .from('topic')
+    .select('*, sub_topic(*, sub_topic_star(*))')
+    .eq('id', topicId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const subTopics = data[0].sub_topic;
+  const starCount = subTopics.reduce((acc: number, curr: any) => {
+    const subTopicStar = curr.sub_topic_star.reduce(
+      (acc1: number, curr: any) => {
+        if (curr.star) {
+          acc1 += curr.star;
+        }
+        return acc1;
+      },
+      0,
+    );
+    return acc + subTopicStar;
+  }, 0);
+
+  return starCount as number;
+}
 export async function getAllSubTopicWithStarByUserId(
   topicId: number,
   userId: string,
@@ -152,7 +179,7 @@ export async function getAllTopicWithSubTopicAndStar() {
 
   // console.log("ALL TOPIC + SUB + STAR: ", data);
 
-  const newData : TopicCategory[] = data.map((topic, topidx) => {
+  const newData: TopicCategory[] = data.map((topic, topidx) => {
     const subTopics = topic.sub_topic.map((subTopic: any, subidx: any) => {
       const subTopicStar = subTopic.sub_topic_star[0].star || 0;
       return {
@@ -166,11 +193,11 @@ export async function getAllTopicWithSubTopicAndStar() {
         battleWon: 0,
         averageTime: 0,
         bestScore: 0,
-        roles:   [
+        roles: [
           { name: 'Leader', desc: 'Gives instructions to teammates' },
           { name: 'Follower', desc: 'Executes tasks based on given orders' },
         ],
-        topic_id : topic.id
+        topic_id: topic.id,
       };
     });
     return {

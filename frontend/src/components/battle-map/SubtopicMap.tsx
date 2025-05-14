@@ -15,6 +15,7 @@ export const SubtopicMap = ({ selectedTopic }: SubtopicMapProps) => {
   const [animateNode, setAnimateNode] = useState<number | null>(null);
   const [showPathProgress, setShowPathProgress] = useState(false);
 
+  console.log(selectedTopic);
   // Animate path on mount
   useEffect(() => {
     setTimeout(() => setShowPathProgress(true), 500);
