@@ -106,7 +106,7 @@ export default function BattlePage() {
             <div className="relative">
               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-dark-blue p-1 mr-4">
                 <div className="w-full h-full rounded-full bg-dark-blue flex items-center justify-center">
-                  <span className="text-xl text-white font-bold">LW</span>
+                  <span className="text-xl text-white font-bold">MM</span>
                 </div>
               </div>
               <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white">

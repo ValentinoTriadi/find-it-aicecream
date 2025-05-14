@@ -1,9 +1,9 @@
 // src/pages/learn/lesson-button.tsx
-import { Check, Crown, Star } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Check, Crown, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 
-import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
+import { cn } from "../../lib/utils";
+import { Button } from "../ui/button";
 
 type LessonButtonProps = {
   id: number;
@@ -46,7 +46,7 @@ export const LessonButton = ({
       to={href}
       aria-disabled={locked}
       key={id}
-      style={{ pointerEvents: locked ? 'none' : 'auto' }}
+      style={{ pointerEvents: locked ? "none" : "auto" }}
     >
       <div
         className="relative"
@@ -65,28 +65,28 @@ export const LessonButton = ({
               />
             </div>
             <Button
-              variant={locked ? 'outline' : 'default'}
+              variant={locked ? "outline" : "default"}
               className="h-[70px] w-[70px] rounded-full border-b-4 border-more-stronger-blue bg-stronger-blue hover:bg-more-stronger-blue"
             >
               <Icon
                 className={cn(
-                  'h-10 w-10 text-white',
-                  locked ? 'opacity-50' : '',
-                  isCompleted && 'fill-none stroke-[4]',
+                  "h-10 w-10 text-white",
+                  locked ? "opacity-50" : "",
+                  isCompleted && "fill-none stroke-[4]"
                 )}
               />
             </Button>
           </div>
         ) : (
           <Button
-            variant={locked ? 'outline' : 'default'}
+            variant={locked ? "outline" : "default"}
             className="h-[70px] w-[70px] rounded-full border-b-4 border-more-stronger-blue bg-stronger-blue hover:bg-more-stronger-blue"
           >
             <Icon
               className={cn(
-                'h-10 w-10 text-white',
-                locked ? 'opacity-50' : '',
-                isCompleted && 'fill-none stroke-[4]',
+                "h-10 w-10 text-white",
+                locked ? "opacity-50" : "",
+                isCompleted && "fill-none stroke-[4]"
               )}
             />
           </Button>

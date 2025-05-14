@@ -6,7 +6,7 @@ export const lessons = [
     title: "Greetings Video",
     lessonType: "VIDEO",
     challenges: [],
-    videoUrl: "dQw4w9WgXcQ",
+    videoUrl: "fwrvfD42h_o?si=--jhxYJtIctm777f",
   },
   {
     id: 2,

@@ -45,6 +45,7 @@ export const Quiz = ({
 
   const challenge = lesson.challenges[activeIndex];
   const options = challenge?.challengeOptions ?? [];
+  const { user } = useUser();
 
   const onSelect = (id: number) => {
     setSelectedOption(id);
@@ -53,8 +54,6 @@ export const Quiz = ({
 
   const onContinue = () => {
     if (!challenge) return;
-
-    const { user } = useUser();
 
     const correctOption = options.find((option) => option.correct);
     if (correctOption?.id === selectedOption) {
@@ -76,6 +75,9 @@ export const Quiz = ({
           }
         })
         .catch(() => toast.error("Something went wrong. Please try again."));
+    } else if (status === "wrong") {
+      setStatus("none");
+      setSelectedOption(undefined);
     } else {
       setStatus("wrong");
       toast.error("Incorrect answer. Try again.");
@@ -109,7 +111,7 @@ export const Quiz = ({
       <LessonHeader title={lesson.title} />
       <div className="flex-1">
         <div className="flex h-full items-center justify-center">
-          <div className="flex w-full flex-col gap-y-12 px-6 lg:min-h-[350px] lg:w-[600px] lg:px-0">
+          <div className="flex w-full flex-col gap-y-12 px-6 mt-6 lg:min-h-[350px] lg:w-[600px] lg:px-0">
             <ChallengeCard
               options={options}
               question={challenge.question}

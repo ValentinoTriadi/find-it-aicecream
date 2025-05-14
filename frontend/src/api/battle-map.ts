@@ -189,7 +189,7 @@ export async function getAllTopicWithSubTopicAndStar() {
         description: subTopic.description,
         points: 50,
         stars: subTopicStar,
-        unlocked: subidx == 0 ? true : false,
+        unlocked: true,
         battleWon: 0,
         averageTime: 0,
         bestScore: 0,
