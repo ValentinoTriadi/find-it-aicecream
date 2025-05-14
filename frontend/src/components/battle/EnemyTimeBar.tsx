@@ -4,13 +4,13 @@ interface EnemyTimerBarProps {
 
 const EnemyTimerBar: React.FC<EnemyTimerBarProps> = ({ progress }) => {
   return (
-    <div className="w-[400px] h-6 bg-[#555] rounded-full shadow-[0_0_30px_5px_rgba(0,0,0,0.5)] overflow-hidden">
+    <div className="w-[400px] h-6 bg-gray-300 rounded-full shadow-md overflow-hidden">
       <div
-        className="h-full bg-[#aaa] transition-all duration-100"
+        className="h-full  bg-gradient-to-r to-dark-blue/70 from-stronger-blue rounded-r-full shadow-md transition-all duration-100"
         style={{
           width: `${progress * 100}%`,
-          borderTopRightRadius: progress === 1 ? '9999px' : '0',
-          borderBottomRightRadius: progress === 1 ? '9999px' : '0',
+          borderTopRightRadius: progress === 1 ? "9999px" : "0",
+          borderBottomRightRadius: progress === 1 ? "9999px" : "0",
         }}
       />
     </div>
